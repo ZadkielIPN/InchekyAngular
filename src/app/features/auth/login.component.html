@@ -1,0 +1,10 @@
+<main class="auth-page">
+  <form class="card auth-card" (ngSubmit)="submit()">
+    <h1>Incheky</h1>
+    <p>Gestión de inventario y ventas</p>
+    <label>Correo<input type="email" name="email" [(ngModel)]="email" required /></label>
+    <label>Contraseña<input type="password" name="contrasena" [(ngModel)]="contrasena" minlength="8" required /></label>
+    @if (error()) { <div class="error">{{ error() }}</div> }
+    <button class="primary" type="submit" [disabled]="auth.loading()">Iniciar sesión</button>
+  </form>
+</main>

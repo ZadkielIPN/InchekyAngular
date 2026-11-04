@@ -1,0 +1,23 @@
+<div class="app-shell">
+  <aside class="sidebar">
+    <h2>Incheky</h2>
+    <nav>
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Dashboard</a>
+      <a routerLink="/productos" routerLinkActive="active">Productos</a>
+      <a routerLink="/proveedores" routerLinkActive="active">Proveedores</a>
+      <a routerLink="/clientes" routerLinkActive="active">Clientes</a>
+      <a routerLink="/usuarios" routerLinkActive="active">Usuarios</a>
+      <a routerLink="/promociones" routerLinkActive="active">Promociones</a>
+      <a routerLink="/ventas" routerLinkActive="active">Ventas</a>
+      <a routerLink="/abastecimientos" routerLinkActive="active">Abastecimientos</a>
+    </nav>
+    <button class="logout" (click)="auth.logout().subscribe()">Cerrar sesión</button>
+  </aside>
+  <section class="content">
+    <header class="topbar">
+      <span>{{ auth.currentUser()?.nombre }} {{ auth.currentUser()?.apellido }}</span>
+      <small>{{ auth.currentUser()?.rol }}</small>
+    </header>
+    <router-outlet />
+  </section>
+</div>

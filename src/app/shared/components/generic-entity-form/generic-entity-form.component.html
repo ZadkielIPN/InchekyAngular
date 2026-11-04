@@ -1,0 +1,6 @@
+<section class="page"><h1>{{ id ? 'Editar' : 'Nuevo' }} {{ title }}</h1><form class="card form-grid" [formGroup]="form" (ngSubmit)="save()">
+  <label>Nombre<input formControlName="nombre"></label>
+  @if(endpoint === 'clientes'){<label>Apellido<input formControlName="apellido"></label><label>Email<input type="email" formControlName="email"></label><label>Puntos<input type="number" formControlName="puntos"></label><label>Nivel<select formControlName="nivelLealtad"><option>BRONCE</option><option>PLATA</option><option>ORO</option><option>PLATINO</option></select></label>}
+  @if(endpoint === 'promociones'){<label>Descuento (%)<input type="number" formControlName="porcentajeDescuento"></label><label>Fecha inicio<input type="date" formControlName="fechaInicio"></label><label>Fecha fin<input type="date" formControlName="fechaFin"></label><label class="checkbox"><input type="checkbox" formControlName="activa"> Activa</label>}
+  @if(error()){<div class="error">{{error()}}</div>}<div><button class="primary" type="submit">Guardar</button> <a [routerLink]="['/', endpoint]">Cancelar</a></div>
+</form></section>
