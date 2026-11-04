@@ -1,0 +1,17 @@
+<section class="page">
+  <div class="page-heading"><h1>{{ title }}</h1>@if(canCreate){<a class="primary" [routerLink]="['/', endpoint, 'nuevo']">Nuevo</a>}</div>
+  @if (loading()) { <app-loading /> } @else {
+    @if (error()) { <div class="error">{{ error() }}</div> }
+    <div class="table-wrap card">
+      <table>
+        <thead><tr>@for (column of columns; track column) { <th>{{ column }}</th> }<th>Acciones</th></tr></thead>
+        <tbody>
+          @for (item of page()?.content ?? []; track item['id']) {
+            <tr>@for (column of columns; track column) { <td>{{ item[column] }}</td> }<td><button (click)="remove(item['id'])">Eliminar</button></td></tr>
+          } @empty { <tr><td [attr.colspan]="columns.length + 1">Sin registros.</td></tr> }
+        </tbody>
+      </table>
+    </div>
+    <div class="pagination"><button (click)="previous()" [disabled]="currentPage===0">Anterior</button><span>Página {{ (page()?.number ?? 0) + 1 }} de {{ page()?.totalPages ?? 1 }}</span><button (click)="next()" [disabled]="page()?.last">Siguiente</button></div>
+  }
+</section>
