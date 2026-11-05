@@ -549,6 +549,27 @@ footer {
 .ticket-item-info small { color: var(--incheky-muted); }
 .ticket-quantity { padding: .35rem; text-align: center; }
 .ticket-points { margin-top: 1rem; }
+.ticket-points-earned {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  margin-bottom: .75rem;
+  padding: .7rem .8rem;
+  border-radius: .65rem;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: .88rem;
+}
+.ticket-discounts {
+  display: grid;
+  gap: .45rem;
+  margin-top: 1rem;
+  padding: .85rem 0;
+  border-top: 1px solid var(--incheky-line);
+  border-bottom: 1px solid var(--incheky-line);
+}
+.ticket-discounts div { display: flex; justify-content: space-between; gap: 1rem; color: var(--incheky-muted); }
+.ticket-discounts strong { color: var(--incheky-ink); white-space: nowrap; }
 .ticket-total { display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 0; font-size: 1.05rem; }
 .ticket-total strong { color: var(--incheky-accent); font-size: 1.45rem; }
 

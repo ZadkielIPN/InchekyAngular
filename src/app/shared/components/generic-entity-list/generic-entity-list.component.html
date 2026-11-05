@@ -12,6 +12,20 @@
     }
   </div>
 
+  <form class="search-bar mb-3" (ngSubmit)="search()">
+    <label class="visually-hidden" for="entitySearch">Buscar en {{ title }}</label>
+    <input
+      id="entitySearch"
+      class="form-control"
+      name="query"
+      [(ngModel)]="query"
+      placeholder="Buscar por nombre, correo o descripción..."
+    />
+    <button class="btn btn-outline-primary" type="submit">
+      <i class="bi bi-search"></i> Buscar
+    </button>
+  </form>
+
   @if (loading()) {
     <app-loading />
   } @else {

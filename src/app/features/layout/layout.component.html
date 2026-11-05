@@ -47,6 +47,8 @@
           <i class="bi bi-person-vcard-fill"></i>
           <span>Administradores</span>
         </a>
+      }
+      @if (canAccess('ADMINISTRADOR', 'CAJERO')) {
         <a routerLink="/promociones" routerLinkActive="active">
           <i class="bi bi-percent"></i>
           <span>Promociones</span>
