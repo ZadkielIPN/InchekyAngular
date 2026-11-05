@@ -17,6 +17,10 @@ export class OperationService {
     return this.api.list<Producto>('productos', 0, 100);
   }
 
+  catalogProducts(query = '') {
+    return this.api.list<Producto>('productos/catalogo', 0, 100, { q: query });
+  }
+
   clients() {
     return this.api.list<Cliente>('clientes', 0, 100);
   }

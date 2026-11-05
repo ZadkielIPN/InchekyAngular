@@ -1,71 +1,135 @@
-import { Component, inject, signal } from '@angular/core';
-import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CurrencyPipe } from '@angular/common';
+import { Component, computed, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { OperationService } from './operation.service';
+import { AuthService } from '../../core/services/auth.service';
 import { Cajero, Cliente, Producto } from '../../core/models/api.models';
+import { OperationService } from './operation.service';
+
+interface TicketItem {
+  producto: Producto;
+  cantidad: number;
+}
 
 @Component({
   selector: 'app-sale-form',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, CurrencyPipe],
   templateUrl: './sale-form.component.html',
 })
 export class SaleFormComponent {
-  private readonly fb = inject(FormBuilder);
   private readonly service = inject(OperationService);
+  readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
-  readonly error = signal('');
   readonly products = signal<Producto[]>([]);
   readonly clients = signal<Cliente[]>([]);
   readonly cashiers = signal<Cajero[]>([]);
-
-  readonly form = this.fb.nonNullable.group({
-    fecha: [new Date().toISOString().slice(0, 16), Validators.required],
-    cajeroId: [0, [Validators.required, Validators.min(1)]],
-    clienteId: [0],
-    puntosUtilizados: [0, [Validators.required, Validators.min(0)]],
-    metodoPago: ['EFECTIVO', Validators.required],
-    detalles: this.fb.array([this.createDetail()]),
-  });
+  readonly ticket = signal<TicketItem[]>([]);
+  readonly loading = signal(false);
+  readonly error = signal('');
+  readonly searchQuery = signal('');
+  readonly selectedClientId = signal<number | null>(null);
+  readonly selectedCashierId = signal<number | null>(null);
+  readonly metodoPago = signal('EFECTIVO');
+  readonly puntosUtilizados = signal(0);
+  readonly total = computed(() =>
+    this.ticket().reduce((sum, item) => sum + item.producto.precio * item.cantidad, 0),
+  );
+  readonly currentUser = this.auth.currentUser;
 
   constructor() {
-    this.service.products().subscribe((page) => this.products.set(page.content));
+    this.loadProducts();
     this.service.clients().subscribe((page) => this.clients.set(page.content));
-    this.service.cashiers().subscribe((page) => this.cashiers.set(page.content));
-  }
-
-  get details() {
-    return this.form.controls.detalles;
-  }
-
-  createDetail() {
-    return this.fb.nonNullable.group({
-      productoId: [0, [Validators.required, Validators.min(1)]],
-      cantidad: [1, [Validators.required, Validators.min(1)]],
-      precioUnitario: [0, [Validators.required, Validators.min(0)]],
-    });
-  }
-
-  addDetail() {
-    this.details.push(this.createDetail());
-  }
-
-  removeDetail(index: number) {
-    if (this.details.length > 1) {
-      this.details.removeAt(index);
+    if (this.auth.hasRole('ADMINISTRADOR')) {
+      this.service.cashiers().subscribe((page) => this.cashiers.set(page.content));
+    } else {
+      this.selectedCashierId.set(this.auth.currentUser()?.id ?? null);
     }
+  }
+
+  searchProducts() {
+    this.loadProducts(this.searchQuery());
+  }
+
+  addProduct(product: Producto) {
+    const current = this.ticket();
+    const existing = current.find((item) => item.producto.id === product.id);
+    if (existing) {
+      if (existing.cantidad >= product.stock) {
+        this.error.set(`No hay más stock disponible de ${product.nombre}.`);
+        return;
+      }
+      this.ticket.set(current.map((item) =>
+        item.producto.id === product.id ? { ...item, cantidad: item.cantidad + 1 } : item,
+      ));
+      return;
+    }
+    this.ticket.set([...current, { producto: product, cantidad: 1 }]);
+    this.error.set('');
+  }
+
+  updateQuantity(productId: number, value: string) {
+    const cantidad = Number(value);
+    const item = this.ticket().find((entry) => entry.producto.id === productId);
+    if (!item) return;
+    if (!Number.isInteger(cantidad) || cantidad < 1 || cantidad > item.producto.stock) {
+      this.error.set(`La cantidad de ${item.producto.nombre} debe estar entre 1 y ${item.producto.stock}.`);
+      return;
+    }
+    this.ticket.set(this.ticket().map((entry) =>
+      entry.producto.id === productId ? { ...entry, cantidad } : entry,
+    ));
+    this.error.set('');
+  }
+
+  removeProduct(productId: number) {
+    this.ticket.set(this.ticket().filter((item) => item.producto.id !== productId));
   }
 
   save() {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
+    this.error.set('');
+    const cashierId = this.auth.hasRole('CAJERO')
+      ? this.auth.currentUser()?.id
+      : this.selectedCashierId();
+    if (!this.selectedClientId()) {
+      this.error.set('Selecciona un cliente para crear el ticket.');
+      return;
+    }
+    if (!cashierId) {
+      this.error.set('Selecciona un cajero.');
+      return;
+    }
+    if (!this.ticket().length) {
+      this.error.set('Agrega al menos un producto al ticket.');
       return;
     }
 
-    this.service.createSale(this.form.getRawValue()).subscribe({
+    this.loading.set(true);
+    this.service.createSale({
+      fecha: new Date().toISOString().slice(0, 19),
+      cajeroId: cashierId,
+      clienteId: this.selectedClientId(),
+      puntosUtilizados: this.puntosUtilizados(),
+      metodoPago: this.metodoPago(),
+      detalles: this.ticket().map((item) => ({
+        productoId: item.producto.id,
+        cantidad: item.cantidad,
+        precioUnitario: item.producto.precio,
+      })),
+    }).subscribe({
       next: () => void this.router.navigate(['/ventas']),
-      error: (error) => this.error.set(error.error?.message ?? 'No se pudo registrar la venta.'),
+      error: (error) => {
+        this.loading.set(false);
+        this.error.set(error.error?.message ?? 'No se pudo registrar la venta.');
+      },
+    });
+  }
+
+  private loadProducts(query = '') {
+    this.service.catalogProducts(query).subscribe({
+      next: (page) => this.products.set(page.content),
+      error: () => this.error.set('No se pudo cargar el catálogo de productos.'),
     });
   }
 }

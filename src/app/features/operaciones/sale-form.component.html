@@ -1,109 +1,107 @@
 <main class="page">
   <div class="page-heading">
     <div>
-      <h1>Nueva venta</h1>
-      <p class="muted mb-0">Registra la operación y sus productos.</p>
+      <span class="eyebrow text-primary">PUNTO DE VENTA</span>
+      <h1>Crear ticket</h1>
+      <p class="muted mb-0">Busca productos, arma el ticket y confirma la venta.</p>
     </div>
+    <a class="btn btn-outline-secondary" routerLink="/ventas">
+      <i class="bi bi-arrow-left"></i> Volver a ventas
+    </a>
   </div>
 
-  <form class="panel" [formGroup]="form" (ngSubmit)="save()">
-    <div class="row g-3">
-      <div class="col-md-4">
-        <label class="form-label" for="fecha">Fecha</label>
-        <input id="fecha" class="form-control" type="datetime-local" formControlName="fecha" />
+  <div class="ticket-layout">
+    <section class="card ticket-catalog">
+      <div class="ticket-panel-heading">
+        <div><h2 class="h5 mb-1">Catálogo</h2><p class="muted mb-0">Busca por nombre o código de barras.</p></div>
+        <form class="ticket-search" (ngSubmit)="searchProducts()">
+          <i class="bi bi-search"></i>
+          <input class="form-control" name="search" [ngModel]="searchQuery()"
+                 (ngModelChange)="searchQuery.set($event)" placeholder="Nombre o código..." />
+        </form>
       </div>
-      <div class="col-md-4">
-        <label class="form-label" for="cajeroId">Cajero</label>
-        <select id="cajeroId" class="form-select" formControlName="cajeroId">
-          <option [ngValue]="0">Selecciona un cajero</option>
-          @for (cashier of cashiers(); track cashier.id) {
-            <option [ngValue]="cashier.id">{{ cashier.nombre }} {{ cashier.apellido }}</option>
-          }
-        </select>
+      <div class="ticket-product-grid">
+        @for (product of products(); track product.id) {
+          <button class="ticket-product" type="button" (click)="addProduct(product)">
+            <span class="ticket-product-icon"><i class="bi bi-box-seam"></i></span>
+            <span class="ticket-product-name">{{ product.nombre }}</span>
+            <span class="ticket-product-meta">{{ product.codigoBarras }} · Stock {{ product.stock }}</span>
+            <strong>{{ product.precio | currency:'MXN':'symbol':'1.2-2' }}</strong>
+            <span class="ticket-add"><i class="bi bi-plus-circle"></i> Agregar</span>
+          </button>
+        } @empty {
+          <div class="empty-state"><i class="bi bi-search"></i><p>No hay productos disponibles.</p></div>
+        }
       </div>
-      <div class="col-md-4">
-        <label class="form-label" for="clienteId">Cliente</label>
-        <select id="clienteId" class="form-select" formControlName="clienteId">
-          <option [ngValue]="0">Venta sin cliente</option>
+    </section>
+
+    <section class="card ticket-summary">
+      <div class="ticket-panel-heading">
+        <div><h2 class="h5 mb-1">Ticket actual</h2><p class="muted mb-0">{{ ticket().length }} productos</p></div>
+        <i class="bi bi-receipt-cutoff ticket-summary-icon"></i>
+      </div>
+
+      <div class="ticket-fields">
+        <label class="form-label" for="cliente">Cliente *</label>
+        <select id="cliente" class="form-select" [ngModel]="selectedClientId()"
+                (ngModelChange)="selectedClientId.set($event ? +$event : null)" name="cliente">
+          <option [ngValue]="null">Selecciona un cliente</option>
           @for (client of clients(); track client.id) {
-            <option [ngValue]="client.id">{{ client.nombre }} {{ client.apellido }}</option>
+            <option [ngValue]="client.id">{{ client.nombre }} {{ client.apellido }} · {{ client.email }}</option>
           }
         </select>
-      </div>
-      <div class="col-md-4">
+
+        @if (auth.hasRole('ADMINISTRADOR')) {
+          <label class="form-label" for="cajero">Cajero *</label>
+          <select id="cajero" class="form-select" [ngModel]="selectedCashierId()"
+                  (ngModelChange)="selectedCashierId.set($event ? +$event : null)" name="cajero">
+            <option [ngValue]="null">Selecciona un cajero</option>
+            @for (cashier of cashiers(); track cashier.id) {
+              <option [ngValue]="cashier.id">{{ cashier.nombre }} {{ cashier.apellido }}</option>
+            }
+          </select>
+        }
+
         <label class="form-label" for="metodoPago">Método de pago</label>
-        <select id="metodoPago" class="form-select" formControlName="metodoPago">
+        <select id="metodoPago" class="form-select" [ngModel]="metodoPago()"
+                (ngModelChange)="metodoPago.set($event)" name="metodoPago">
           <option value="EFECTIVO">Efectivo</option>
           <option value="TARJETA">Tarjeta</option>
           <option value="TRANSFERENCIA">Transferencia</option>
         </select>
       </div>
-      <div class="col-md-4">
-        <label class="form-label" for="puntosUtilizados">Puntos utilizados</label>
-        <input
-          id="puntosUtilizados"
-          class="form-control"
-          type="number"
-          formControlName="puntosUtilizados"
-        />
-      </div>
-    </div>
 
-    <hr class="my-4" />
-
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h2 class="h5 mb-0">Detalle de venta</h2>
-      <button class="btn btn-outline-primary btn-sm" type="button" (click)="addDetail()">
-        <i class="bi bi-plus-lg"></i>
-        Agregar producto
-      </button>
-    </div>
-
-    <div formArrayName="detalles" class="vstack gap-3">
-      @for (detail of details.controls; track $index) {
-        <div class="row g-2 align-items-end" [formGroupName]="$index">
-          <div class="col-md-6">
-            <label class="form-label">Producto</label>
-            <select class="form-select" formControlName="productoId">
-              <option [ngValue]="0">Selecciona un producto</option>
-              @for (product of products(); track product.id) {
-                <option [ngValue]="product.id">{{ product.nombre }}</option>
-              }
-            </select>
-          </div>
-          <div class="col-md-2">
-            <label class="form-label">Cantidad</label>
-            <input class="form-control" type="number" min="1" formControlName="cantidad" />
-          </div>
-          <div class="col-md-3">
-            <label class="form-label">Precio unitario</label>
-            <input
-              class="form-control"
-              type="number"
-              min="0"
-              step="0.01"
-              formControlName="precioUnitario"
-            />
-          </div>
-          <div class="col-md-1">
-            <button class="btn btn-outline-danger" type="button" (click)="removeDetail($index)">
+      <div class="ticket-items">
+        @for (item of ticket(); track item.producto.id) {
+          <div class="ticket-item">
+            <div class="ticket-item-info">
+              <strong>{{ item.producto.nombre }}</strong>
+              <small>{{ item.producto.precio | currency:'MXN':'symbol':'1.2-2' }} c/u</small>
+            </div>
+            <input class="form-control ticket-quantity" type="number" min="1" [max]="item.producto.stock"
+                   [value]="item.cantidad" (change)="updateQuantity(item.producto.id, $any($event.target).value)" />
+            <strong>{{ item.producto.precio * item.cantidad | currency:'MXN':'symbol':'1.2-2' }}</strong>
+            <button class="btn btn-sm btn-link text-danger" type="button" (click)="removeProduct(item.producto.id)">
               <i class="bi bi-trash"></i>
             </button>
           </div>
-        </div>
-      }
-    </div>
+        } @empty {
+          <div class="empty-state"><i class="bi bi-cart3"></i><p>Agrega productos al ticket.</p></div>
+        }
+      </div>
 
-    @if (error()) {
-      <div class="notice error mt-4" role="alert">{{ error() }}</div>
-    }
+      <div class="ticket-points">
+        <label class="form-label" for="puntos">Puntos a utilizar</label>
+        <input id="puntos" class="form-control" type="number" min="0" [ngModel]="puntosUtilizados()"
+               (ngModelChange)="puntosUtilizados.set(+$event || 0)" name="puntos" />
+      </div>
 
-    <div class="d-flex gap-2 mt-4">
-      <button class="btn btn-primary" type="submit">
-        <i class="bi bi-check-lg"></i>
-        Registrar venta
+      @if (error()) { <div class="notice error mt-3">{{ error() }}</div> }
+      <div class="ticket-total"><span>Total estimado</span><strong>{{ total() | currency:'MXN':'symbol':'1.2-2' }}</strong></div>
+      <button class="btn btn-primary w-100" type="button" (click)="save()" [disabled]="loading()">
+        @if (loading()) { <span class="spinner-border spinner-border-sm me-2"></span> }
+        <i class="bi bi-check2-circle"></i> Confirmar ticket
       </button>
-      <a class="btn btn-outline-secondary" routerLink="/ventas">Cancelar</a>
-    </div>
-  </form>
+    </section>
+  </div>
 </main>
