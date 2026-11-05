@@ -1,3 +1,6 @@
+@if (auth.hasRole('CLIENTE')) {
+  <app-client-home />
+} @else {
 <main class="page">
   <div class="mb-4">
     <h1>Panel principal</h1>
@@ -29,3 +32,4 @@
     </a>
   </div>
 </main>
+}

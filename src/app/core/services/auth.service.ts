@@ -3,7 +3,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, finalize, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { UsuarioSession } from '../models/api.models';
+import { UsuarioProfile, UsuarioProfileRequest, UsuarioSession } from '../models/api.models';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -28,6 +28,44 @@ export class AuthService {
         }),
         finalize(() => this.loading.set(false)),
       );
+  }
+
+  register(data: {
+    nombre: string;
+    apellido: string;
+    email: string;
+    contrasena: string;
+  }) {
+    this.loading.set(true);
+    return this.http
+      .post<UsuarioSession>(`${environment.apiUrl}/auth/register`, {
+        ...data,
+        puntos: 0,
+        nivelLealtad: 'BRONCE',
+      })
+      .pipe(
+        tap((user) => {
+          this.session.set(user);
+          localStorage.setItem('incheky-session', JSON.stringify(user));
+        }),
+        finalize(() => this.loading.set(false)),
+      );
+  }
+
+  getProfile() {
+    return this.http.get<UsuarioProfile>(`${environment.apiUrl}/auth/me`);
+  }
+
+  updateProfile(data: UsuarioProfileRequest) {
+    return this.http.put<UsuarioProfile>(`${environment.apiUrl}/auth/me`, data).pipe(
+      tap((profile) => {
+        const current = this.session();
+        if (!current) return;
+        const updated = { ...current, ...profile };
+        this.session.set(updated);
+        localStorage.setItem('incheky-session', JSON.stringify(updated));
+      }),
+    );
   }
 
   getLoginErrorMessage(error: unknown): string {

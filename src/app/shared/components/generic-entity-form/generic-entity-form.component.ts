@@ -22,8 +22,12 @@ export class GenericEntityFormComponent {
     nombre: ['', Validators.required],
     apellido: [''],
     email: ['', Validators.email],
+    contrasena: [''],
     telefono: [''],
     direccion: [''],
+    numeroEmpleado: [0],
+    turno: ['MATUTINO'],
+    cajaAsignada: [1],
     puntos: [0],
     nivelLealtad: ['BRONCE'],
     porcentajeDescuento: [0],
@@ -32,6 +36,49 @@ export class GenericEntityFormComponent {
     activa: [true],
   });
   constructor() {
+    if (this.endpoint === 'clientes') {
+      this.form.controls.apellido.addValidators(Validators.required);
+      this.form.controls.email.addValidators(Validators.required);
+      this.form.controls.contrasena.addValidators(
+        this.id
+          ? Validators.pattern(/^$|^.{8,20}$/)
+          : [Validators.required, Validators.minLength(8), Validators.maxLength(20)],
+      );
+      this.form.controls.apellido.updateValueAndValidity();
+      this.form.controls.email.updateValueAndValidity();
+      this.form.controls.contrasena.updateValueAndValidity();
+    }
+
+    if (this.endpoint === 'cajeros') {
+      this.form.controls.apellido.addValidators(Validators.required);
+      this.form.controls.email.addValidators(Validators.required);
+      this.form.controls.contrasena.addValidators(
+        this.id
+          ? Validators.pattern(/^$|^.{8,20}$/)
+          : [Validators.required, Validators.minLength(8), Validators.maxLength(20)],
+      );
+      this.form.controls.numeroEmpleado.addValidators([Validators.required, Validators.min(1)]);
+      this.form.controls.cajaAsignada.addValidators([Validators.required, Validators.min(1)]);
+      this.form.controls.apellido.updateValueAndValidity();
+      this.form.controls.email.updateValueAndValidity();
+      this.form.controls.contrasena.updateValueAndValidity();
+      this.form.controls.numeroEmpleado.updateValueAndValidity();
+      this.form.controls.cajaAsignada.updateValueAndValidity();
+    }
+
+    if (this.endpoint === 'administradores') {
+      this.form.controls.apellido.addValidators(Validators.required);
+      this.form.controls.email.addValidators(Validators.required);
+      this.form.controls.contrasena.addValidators(
+        this.id
+          ? Validators.pattern(/^$|^.{8,20}$/)
+          : [Validators.required, Validators.minLength(8), Validators.maxLength(20)],
+      );
+      this.form.controls.apellido.updateValueAndValidity();
+      this.form.controls.email.updateValueAndValidity();
+      this.form.controls.contrasena.updateValueAndValidity();
+    }
+
     if (this.id)
       this.api
         .get<Record<string, unknown>>(`${this.endpoint}/${this.id}`)
@@ -42,12 +89,72 @@ export class GenericEntityFormComponent {
       this.form.markAllAsTouched();
       return;
     }
+    const payload = this.buildPayload();
     const request = this.id
-      ? this.api.put(`${this.endpoint}/${this.id}`, this.form.getRawValue())
-      : this.api.post(this.endpoint, this.form.getRawValue());
+      ? this.api.put(`${this.endpoint}/${this.id}`, payload)
+      : this.api.post(this.endpoint, payload);
     request.subscribe({
       next: () => void this.router.navigate(['/', this.endpoint]),
       error: (error) => this.error.set(error.error?.message ?? 'No se pudo guardar.'),
     });
+  }
+
+  private buildPayload(): Record<string, unknown> {
+    const value = this.form.getRawValue();
+
+    if (this.endpoint === 'clientes') {
+      const payload: Record<string, unknown> = {
+        nombre: value.nombre,
+        apellido: value.apellido,
+        email: value.email,
+        puntos: value.puntos,
+        nivelLealtad: value.nivelLealtad,
+      };
+
+      if (!this.id || value.contrasena.trim()) {
+        payload['contrasena'] = value.contrasena;
+      }
+
+      return payload;
+    }
+
+    if (this.endpoint === 'cajeros') {
+      const payload: Record<string, unknown> = {
+        nombre: value.nombre,
+        apellido: value.apellido,
+        email: value.email,
+        numeroEmpleado: value.numeroEmpleado,
+        turno: value.turno,
+        cajaAsignada: value.cajaAsignada,
+      };
+
+      if (!this.id || value.contrasena.trim()) {
+        payload['contrasena'] = value.contrasena;
+      }
+
+      return payload;
+    }
+
+    if (this.endpoint === 'administradores') {
+      const payload: Record<string, unknown> = {
+        nombre: value.nombre,
+        apellido: value.apellido,
+        email: value.email,
+      };
+
+      if (!this.id || value.contrasena.trim()) {
+        payload['contrasena'] = value.contrasena;
+      }
+
+      return payload;
+    }
+
+    return {
+      nombre: value.nombre,
+      porcentajeDescuento: value.porcentajeDescuento,
+      fechaInicio: value.fechaInicio,
+      fechaFin: value.fechaFin || null,
+      activa: value.activa,
+    };
   }
 }

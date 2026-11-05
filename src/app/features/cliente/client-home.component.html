@@ -1,0 +1,51 @@
+<main class="page client-store">
+  <section class="client-hero">
+    <div>
+      <span class="eyebrow">INCHEKY</span>
+      <h1>Todo lo que necesitas, cerca de ti.</h1>
+      <p>Consulta nuestros productos disponibles y encuentra tus favoritos en sucursal.</p>
+    </div>
+    <i class="bi bi-basket2-fill client-hero-icon"></i>
+  </section>
+
+  <section class="store-info card">
+    <i class="bi bi-geo-alt-fill"></i>
+    <div>
+      <strong>Sucursal Incheky</strong>
+      <span class="muted">Lunes a domingo · 8:00 a 21:00</span>
+    </div>
+  </section>
+
+  <div class="store-toolbar">
+    <div>
+      <h2 class="h4 mb-1">Productos disponibles</h2>
+      <p class="muted mb-0">Catálogo de consulta para clientes</p>
+    </div>
+    <div class="store-search">
+      <i class="bi bi-search"></i>
+      <input class="form-control" [ngModel]="query()" (ngModelChange)="onSearch($event)"
+             placeholder="Buscar productos..." aria-label="Buscar productos" />
+    </div>
+  </div>
+
+  @if (error()) { <div class="notice error">{{ error() }}</div> }
+  @if (loading()) {
+    <div class="empty-state"><span class="spinner-border text-primary"></span><p>Cargando productos...</p></div>
+  } @else if (productos().length === 0) {
+    <div class="empty-state"><i class="bi bi-box-seam"></i><p>No encontramos productos disponibles.</p></div>
+  } @else {
+    <div class="product-grid">
+      @for (producto of productos(); track producto.id) {
+        <article class="card product-card">
+          <img [src]="imageUrl(producto)" [alt]="producto.nombre" />
+          <div class="product-card-body">
+            <span class="product-category">{{ producto.unidadMedida }}</span>
+            <h3>{{ producto.nombre }}</h3>
+            <p>{{ producto.descripcion }}</p>
+            <strong class="product-price">{{ producto.precio | currency:'MXN':'symbol':'1.2-2' }}</strong>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</main>
