@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../../core/services/api.service';
+import { Producto } from '../../../core/models/api.models';
 
 @Component({
   selector: 'app-generic-entity-form',
@@ -18,6 +19,7 @@ export class GenericEntityFormComponent {
   readonly title = this.route.snapshot.data['title'] as string;
   readonly id = Number(this.route.snapshot.paramMap.get('id'));
   readonly error = signal('');
+  readonly products = signal<Producto[]>([]);
   readonly form = this.fb.nonNullable.group({
     nombre: ['', Validators.required],
     apellido: [''],
@@ -34,8 +36,16 @@ export class GenericEntityFormComponent {
     fechaInicio: [''],
     fechaFin: [''],
     activa: [true],
+    productoIds: this.fb.nonNullable.control<number[]>([]),
   });
   constructor() {
+    if (this.endpoint === 'promociones') {
+      this.api.list<Producto>('productos', 0, 100).subscribe({
+        next: (page) => this.products.set(page.content),
+        error: () => this.error.set('No se pudieron cargar los productos para la promoción.'),
+      });
+    }
+
     if (this.endpoint === 'clientes') {
       this.form.controls.apellido.addValidators(Validators.required);
       this.form.controls.email.addValidators(Validators.required);
@@ -155,6 +165,7 @@ export class GenericEntityFormComponent {
       fechaInicio: value.fechaInicio,
       fechaFin: value.fechaFin || null,
       activa: value.activa,
+      productoIds: value.productoIds,
     };
   }
 }

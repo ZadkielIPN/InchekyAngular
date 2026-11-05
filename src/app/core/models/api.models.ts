@@ -18,7 +18,7 @@ export interface ApiError {
 
 export type Rol = 'CLIENTE' | 'ADMINISTRADOR' | 'CAJERO';
 export type Turno = 'MATUTINO' | 'VESPERTINO' | 'NOCTURNO';
-export type NivelLealtad = 'BRONCE' | 'PLATA' | 'ORO' | 'PLATINO';
+export type NivelLealtad = 'BRONCE' | 'PLATA' | 'ORO';
 export type MetodoPago = 'EFECTIVO' | 'TARJETA' | 'TRANSFERENCIA';
 export type UnidadMedida = 'PIEZA' | 'KILOGRAMO' | 'LITRO' | 'METRO';
 
