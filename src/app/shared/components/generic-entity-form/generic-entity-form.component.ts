@@ -22,6 +22,8 @@ export class GenericEntityFormComponent {
     nombre: ['', Validators.required],
     apellido: [''],
     email: ['', Validators.email],
+    contrasena: [''],
+    rol: ['CLIENTE'],
     telefono: [''],
     direccion: [''],
     puntos: [0],
@@ -32,6 +34,19 @@ export class GenericEntityFormComponent {
     activa: [true],
   });
   constructor() {
+    if (this.endpoint === 'clientes') {
+      this.form.controls.apellido.addValidators(Validators.required);
+      this.form.controls.email.addValidators(Validators.required);
+      this.form.controls.contrasena.addValidators([
+        Validators.required,
+        Validators.minLength(8),
+        Validators.maxLength(20),
+      ]);
+      this.form.controls.apellido.updateValueAndValidity();
+      this.form.controls.email.updateValueAndValidity();
+      this.form.controls.contrasena.updateValueAndValidity();
+    }
+
     if (this.id)
       this.api
         .get<Record<string, unknown>>(`${this.endpoint}/${this.id}`)
@@ -42,12 +57,37 @@ export class GenericEntityFormComponent {
       this.form.markAllAsTouched();
       return;
     }
+    const payload = this.buildPayload();
     const request = this.id
-      ? this.api.put(`${this.endpoint}/${this.id}`, this.form.getRawValue())
-      : this.api.post(this.endpoint, this.form.getRawValue());
+      ? this.api.put(`${this.endpoint}/${this.id}`, payload)
+      : this.api.post(this.endpoint, payload);
     request.subscribe({
       next: () => void this.router.navigate(['/', this.endpoint]),
       error: (error) => this.error.set(error.error?.message ?? 'No se pudo guardar.'),
     });
+  }
+
+  private buildPayload(): Record<string, unknown> {
+    const value = this.form.getRawValue();
+
+    if (this.endpoint === 'clientes') {
+      return {
+        nombre: value.nombre,
+        apellido: value.apellido,
+        email: value.email,
+        contrasena: value.contrasena,
+        rol: 'CLIENTE',
+        puntos: value.puntos,
+        nivelLealtad: value.nivelLealtad,
+      };
+    }
+
+    return {
+      nombre: value.nombre,
+      porcentajeDescuento: value.porcentajeDescuento,
+      fechaInicio: value.fechaInicio,
+      fechaFin: value.fechaFin || null,
+      activa: value.activa,
+    };
   }
 }

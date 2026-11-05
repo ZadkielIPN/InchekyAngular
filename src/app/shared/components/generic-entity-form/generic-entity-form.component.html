@@ -19,6 +19,19 @@
           <label class="form-label" for="email">Correo electrónico</label>
           <input id="email" class="form-control" type="email" formControlName="email" />
         </div>
+        <div class="col-md-6">
+          <label class="form-label" for="contrasena">Contraseña</label>
+          <input
+            id="contrasena"
+            class="form-control"
+            type="password"
+            formControlName="contrasena"
+            minlength="8"
+            maxlength="20"
+            required
+          />
+          <small class="form-text text-muted">Debe tener entre 8 y 20 caracteres.</small>
+        </div>
         <div class="col-md-3">
           <label class="form-label" for="puntos">Puntos</label>
           <input id="puntos" class="form-control" type="number" formControlName="puntos" />
