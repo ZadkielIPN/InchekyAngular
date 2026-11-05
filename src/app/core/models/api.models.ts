@@ -119,7 +119,9 @@ export interface DetalleVenta {
   cantidad: number;
   precioUnitario: number;
   promocionId?: number;
-  subtotal?: number;
+descuentoPorcentaje?: number;
+descuentoImporte?: number;
+subtotal?: number;
 }
 
 export interface Venta {

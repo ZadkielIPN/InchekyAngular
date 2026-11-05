@@ -5,6 +5,7 @@ import {
   Cajero,
   Cliente,
   Producto,
+  Promocion,
   Proveedor,
   Venta,
 } from '../../core/models/api.models';
@@ -27,6 +28,10 @@ export class OperationService {
 
   cashiers() {
     return this.api.list<Cajero>('cajeros', 0, 100);
+  }
+
+  promotions() {
+    return this.api.list<Promocion>('promociones', 0, 100);
   }
 
   providers() {

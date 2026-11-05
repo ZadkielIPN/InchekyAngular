@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
-import { Cajero, Cliente, Producto } from '../../core/models/api.models';
+import { Cajero, Cliente, Producto, Promocion } from '../../core/models/api.models';
 import { OperationService } from './operation.service';
 import {
   EntityDropdownComponent,
@@ -30,6 +30,7 @@ export class SaleFormComponent {
   readonly products = signal<Producto[]>([]);
   readonly clients = signal<Cliente[]>([]);
   readonly cashiers = signal<Cajero[]>([]);
+  readonly promotions = signal<Promocion[]>([]);
   readonly ticket = signal<TicketItem[]>([]);
   readonly loading = signal(false);
   readonly error = signal('');
@@ -44,9 +45,15 @@ export class SaleFormComponent {
   readonly subtotal = computed(() =>
     this.ticket().reduce((sum, item) => sum + item.producto.precio * item.cantidad, 0),
   );
+  readonly promotionDiscount = computed(() =>
+    this.ticket().reduce((sum, item) => sum + this.itemPromotionDiscount(item), 0),
+  );
+  readonly subtotalAfterPromotions = computed(() =>
+    Math.max(this.subtotal() - this.promotionDiscount(), 0),
+  );
   readonly loyaltyDiscount = computed(() => {
     const percentage = { BRONCE: 0, PLATA: 5, ORO: 10 }[this.selectedClient()?.nivelLealtad ?? 'BRONCE'];
-    return this.subtotal() * percentage / 100;
+    return this.subtotalAfterPromotions() * percentage / 100;
   });
   readonly pointsDiscount = computed(() =>
     Math.min(this.maxPoints(), Math.max(this.puntosUtilizados(), 0)) * 0.5,
@@ -54,12 +61,15 @@ export class SaleFormComponent {
   readonly maxPoints = computed(() =>
     Math.min(
       this.selectedClient()?.puntos ?? 0,
-      Math.floor(Math.max(this.subtotal() - this.loyaltyDiscount(), 0) / 0.5),
+      Math.floor(Math.max(this.subtotalAfterPromotions() - this.loyaltyDiscount(), 0) / 0.5),
     ),
   );
   readonly earnedPoints = computed(() => Math.floor(this.total() / 10));
   readonly total = computed(() =>
-    Math.max(this.subtotal() - this.loyaltyDiscount() - this.pointsDiscount(), 0),
+    Math.max(
+      this.subtotalAfterPromotions() - this.loyaltyDiscount() - this.pointsDiscount(),
+      0,
+    ),
   );
   readonly currentUser = this.auth.currentUser;
   private readonly search$ = new Subject<string>();
@@ -93,6 +103,10 @@ export class SaleFormComponent {
         error: () => this.error.set('No se pudo cargar el catálogo de productos.'),
       });
     this.service.clients().subscribe((page) => this.clients.set(page.content));
+    this.service.promotions().subscribe({
+      next: (page) => this.promotions.set(page.content),
+      error: () => this.error.set('No se pudieron cargar las promociones activas.'),
+    });
     if (this.auth.hasRole('ADMINISTRADOR')) {
       this.service.cashiers().subscribe((page) => this.cashiers.set(page.content));
     } else {
@@ -147,6 +161,25 @@ export class SaleFormComponent {
 
   removeProduct(productId: number) {
     this.ticket.set(this.ticket().filter((item) => item.producto.id !== productId));
+  }
+
+  activePromotion(product: Producto): Promocion | null {
+    const today = new Date();
+    return this.promotions()
+      .filter((promotion) =>
+        promotion.activa
+        && (product.promocionIds ?? []).includes(promotion.id)
+        && new Date(`${promotion.fechaInicio}T00:00:00`) <= today
+        && (!promotion.fechaFin || new Date(`${promotion.fechaFin}T23:59:59`) >= today),
+      )
+      .sort((a, b) => b.porcentajeDescuento - a.porcentajeDescuento)[0] ?? null;
+  }
+
+  itemPromotionDiscount(item: TicketItem): number {
+    const promotion = this.activePromotion(item.producto);
+    return promotion
+      ? item.producto.precio * item.cantidad * promotion.porcentajeDescuento / 100
+      : 0;
   }
 
   save() {

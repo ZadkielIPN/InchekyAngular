@@ -105,6 +105,25 @@ export class GenericEntityFormComponent {
         .subscribe((value) => this.form.patchValue(value as never));
   }
   save() {
+    if (this.endpoint === 'promociones') {
+      const { fechaInicio, fechaFin, productoIds, porcentajeDescuento } = this.form.getRawValue();
+      if (!fechaInicio) {
+        this.error.set('La fecha de inicio es obligatoria.');
+        return;
+      }
+      if (fechaFin && fechaFin < fechaInicio) {
+        this.error.set('La fecha de fin no puede ser anterior a la fecha de inicio.');
+        return;
+      }
+      if (porcentajeDescuento < 0 || porcentajeDescuento > 100) {
+        this.error.set('El descuento debe estar entre 0% y 100%.');
+        return;
+      }
+      if (!productoIds.length) {
+        this.error.set('Selecciona al menos un producto para la promoción.');
+        return;
+      }
+    }
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;

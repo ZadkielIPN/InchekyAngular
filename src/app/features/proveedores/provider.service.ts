@@ -5,8 +5,8 @@ import { Proveedor } from '../../core/models/api.models';
 @Injectable({ providedIn: 'root' })
 export class ProviderService {
   private readonly api = inject(ApiService);
-  list(page = 0) {
-    return this.api.list<Proveedor>('proveedores', page);
+  list(page = 0, q = '') {
+    return this.api.list<Proveedor>('proveedores', page, 10, { q });
   }
   get(id: number) {
     return this.api.get<Proveedor>(`proveedores/${id}`);
