@@ -44,7 +44,7 @@
       <div class="ticket-fields">
         <label class="form-label" for="cliente">Cliente *</label>
         <select id="cliente" class="form-select" [ngModel]="selectedClientId()"
-                (ngModelChange)="selectedClientId.set($event ? +$event : null)" name="cliente">
+                (ngModelChange)="onClientChange($event ? +$event : null)" name="cliente">
           <option [ngValue]="null">Selecciona un cliente</option>
           @for (client of clients(); track client.id) {
             <option [ngValue]="client.id">{{ client.nombre }} {{ client.apellido }} · {{ client.email }}</option>
@@ -93,10 +93,22 @@
       <div class="ticket-points">
         <label class="form-label" for="puntos">Puntos a utilizar</label>
         <input id="puntos" class="form-control" type="number" min="0" [ngModel]="puntosUtilizados()"
+               [max]="selectedClient()?.puntos ?? 0"
                (ngModelChange)="puntosUtilizados.set(+$event || 0)" name="puntos" />
+        @if (selectedClient()) {
+          <small class="text-muted">
+            Disponibles: {{ selectedClient()?.puntos }} puntos.
+            Nivel {{ selectedClient()?.nivelLealtad }} aplica {{ loyaltyDiscount() | currency:'MXN':'symbol':'1.2-2' }} de descuento.
+          </small>
+        }
       </div>
 
       @if (error()) { <div class="notice error mt-3">{{ error() }}</div> }
+      <div class="ticket-discounts">
+        <div><span>Subtotal</span><strong>{{ subtotal() | currency:'MXN':'symbol':'1.2-2' }}</strong></div>
+        <div><span>Descuento por nivel</span><strong>-{{ loyaltyDiscount() | currency:'MXN':'symbol':'1.2-2' }}</strong></div>
+        <div><span>Descuento por puntos</span><strong>-{{ pointsDiscount() | currency:'MXN':'symbol':'1.2-2' }}</strong></div>
+      </div>
       <div class="ticket-total"><span>Total estimado</span><strong>{{ total() | currency:'MXN':'symbol':'1.2-2' }}</strong></div>
       <button class="btn btn-primary w-100" type="button" (click)="save()" [disabled]="loading()">
         @if (loading()) { <span class="spinner-border spinner-border-sm me-2"></span> }

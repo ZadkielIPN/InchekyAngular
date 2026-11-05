@@ -34,8 +34,25 @@ export class SaleFormComponent {
   readonly selectedCashierId = signal<number | null>(null);
   readonly metodoPago = signal('EFECTIVO');
   readonly puntosUtilizados = signal(0);
-  readonly total = computed(() =>
+  readonly selectedClient = computed(() =>
+    this.clients().find((client) => client.id === this.selectedClientId()) ?? null,
+  );
+  readonly subtotal = computed(() =>
     this.ticket().reduce((sum, item) => sum + item.producto.precio * item.cantidad, 0),
+  );
+  readonly loyaltyDiscount = computed(() => {
+    const percentage = { BRONCE: 0, PLATA: 5, ORO: 10 }[this.selectedClient()?.nivelLealtad ?? 'BRONCE'];
+    return this.subtotal() * percentage / 100;
+  });
+  readonly pointsDiscount = computed(() =>
+    Math.min(
+      Math.max(this.puntosUtilizados(), 0),
+      this.selectedClient()?.puntos ?? 0,
+      this.subtotal() - this.loyaltyDiscount(),
+    ),
+  );
+  readonly total = computed(() =>
+    Math.max(this.subtotal() - this.loyaltyDiscount() - this.pointsDiscount(), 0),
   );
   readonly currentUser = this.auth.currentUser;
   private readonly search$ = new Subject<string>();
@@ -62,6 +79,11 @@ export class SaleFormComponent {
 
   searchProducts() {
     this.search$.next(this.searchQuery().trim());
+  }
+
+  onClientChange(value: number | null) {
+    this.selectedClientId.set(value);
+    this.puntosUtilizados.set(0);
   }
 
   addProduct(product: Producto) {
@@ -114,6 +136,10 @@ export class SaleFormComponent {
     }
     if (!this.ticket().length) {
       this.error.set('Agrega al menos un producto al ticket.');
+      return;
+    }
+    if (this.puntosUtilizados() > (this.selectedClient()?.puntos ?? 0)) {
+      this.error.set('Los puntos utilizados no pueden superar los puntos disponibles del cliente.');
       return;
     }
 

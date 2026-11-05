@@ -63,7 +63,6 @@
             <option value="BRONCE">Bronce</option>
             <option value="PLATA">Plata</option>
             <option value="ORO">Oro</option>
-            <option value="PLATINO">Platino</option>
           </select>
         </div>
       }
@@ -87,6 +86,17 @@
         <div class="col-md-4">
           <label class="form-label" for="fechaFin">Fecha de fin</label>
           <input id="fechaFin" class="form-control" type="date" formControlName="fechaFin" />
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="productoIds">Productos incluidos</label>
+          <select id="productoIds" class="form-select" multiple formControlName="productoIds" size="6">
+            @for (product of products(); track product.id) {
+              <option [ngValue]="product.id">{{ product.id }} - {{ product.nombre }}</option>
+            }
+          </select>
+          <small class="form-text text-muted">
+            Mantén presionada la tecla Ctrl (o Cmd en macOS) para seleccionar varios productos.
+          </small>
         </div>
         <div class="col-12 form-check ms-2">
           <input id="activa" class="form-check-input" type="checkbox" formControlName="activa" />
