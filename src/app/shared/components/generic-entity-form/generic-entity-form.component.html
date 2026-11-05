@@ -36,11 +36,7 @@
           </small>
         </div>
         @if (endpoint === 'cajeros') {
-          <div class="col-md-4">
-            <label class="form-label" for="numeroEmpleado">Número de empleado</label>
-            <input id="numeroEmpleado" class="form-control" type="number" min="1" formControlName="numeroEmpleado" />
-          </div>
-          <div class="col-md-4">
+          <div class="col-md-6">
             <label class="form-label" for="turno">Turno</label>
             <select id="turno" class="form-select" formControlName="turno">
               <option value="MATUTINO">Matutino</option>
@@ -48,7 +44,7 @@
               <option value="NOCTURNO">Nocturno</option>
             </select>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-6">
             <label class="form-label" for="cajaAsignada">Caja asignada</label>
             <input id="cajaAsignada" class="form-control" type="number" min="1" formControlName="cajaAsignada" />
           </div>

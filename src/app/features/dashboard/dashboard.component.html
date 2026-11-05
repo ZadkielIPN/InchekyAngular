@@ -37,6 +37,13 @@
       <strong>Abastecimientos</strong>
       <span class="muted">Entradas de inventario</span>
     </a>
+    @if (auth.hasRole('ADMINISTRADOR', 'CAJERO')) {
+      <a class="card dashboard-card" routerLink="/promociones">
+        <i class="bi bi-percent"></i>
+        <strong>Promociones</strong>
+        <span class="muted">Consulta descuentos vigentes</span>
+      </a>
+    }
     @if (auth.hasRole('ADMINISTRADOR')) {
       <a class="card dashboard-card" routerLink="/administradores">
         <i class="bi bi-person-vcard-fill"></i>
@@ -47,11 +54,6 @@
         <i class="bi bi-person-badge-fill"></i>
         <strong>Cajeros</strong>
         <span class="muted">Administra el personal de cajas</span>
-      </a>
-      <a class="card dashboard-card" routerLink="/promociones">
-        <i class="bi bi-percent"></i>
-        <strong>Promociones</strong>
-        <span class="muted">Configura descuentos vigentes</span>
       </a>
     }
   </div>

@@ -45,12 +45,15 @@ export class SaleFormComponent {
     return this.subtotal() * percentage / 100;
   });
   readonly pointsDiscount = computed(() =>
+    Math.min(this.maxPoints(), Math.max(this.puntosUtilizados(), 0)) * 0.5,
+  );
+  readonly maxPoints = computed(() =>
     Math.min(
-      Math.max(this.puntosUtilizados(), 0),
       this.selectedClient()?.puntos ?? 0,
-      this.subtotal() - this.loyaltyDiscount(),
+      Math.floor(Math.max(this.subtotal() - this.loyaltyDiscount(), 0) / 0.5),
     ),
   );
+  readonly earnedPoints = computed(() => Math.floor(this.total() / 10));
   readonly total = computed(() =>
     Math.max(this.subtotal() - this.loyaltyDiscount() - this.pointsDiscount(), 0),
   );
@@ -84,6 +87,11 @@ export class SaleFormComponent {
   onClientChange(value: number | null) {
     this.selectedClientId.set(value);
     this.puntosUtilizados.set(0);
+  }
+
+  onPointsChange(value: number) {
+    const points = Number.isFinite(+value) ? Math.max(+value, 0) : 0;
+    this.puntosUtilizados.set(Math.min(Math.floor(points), this.maxPoints()));
   }
 
   addProduct(product: Producto) {
@@ -138,8 +146,8 @@ export class SaleFormComponent {
       this.error.set('Agrega al menos un producto al ticket.');
       return;
     }
-    if (this.puntosUtilizados() > (this.selectedClient()?.puntos ?? 0)) {
-      this.error.set('Los puntos utilizados no pueden superar los puntos disponibles del cliente.');
+    if (this.puntosUtilizados() > this.maxPoints()) {
+      this.error.set(`Los puntos utilizados no pueden superar ${this.maxPoints()} puntos.`);
       return;
     }
 

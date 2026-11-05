@@ -27,7 +27,6 @@ export class GenericEntityFormComponent {
     contrasena: [''],
     telefono: [''],
     direccion: [''],
-    numeroEmpleado: [0],
     turno: ['MATUTINO'],
     cajaAsignada: [1],
     puntos: [0],
@@ -67,12 +66,10 @@ export class GenericEntityFormComponent {
           ? Validators.pattern(/^$|^.{8,20}$/)
           : [Validators.required, Validators.minLength(8), Validators.maxLength(20)],
       );
-      this.form.controls.numeroEmpleado.addValidators([Validators.required, Validators.min(1)]);
       this.form.controls.cajaAsignada.addValidators([Validators.required, Validators.min(1)]);
       this.form.controls.apellido.updateValueAndValidity();
       this.form.controls.email.updateValueAndValidity();
       this.form.controls.contrasena.updateValueAndValidity();
-      this.form.controls.numeroEmpleado.updateValueAndValidity();
       this.form.controls.cajaAsignada.updateValueAndValidity();
     }
 
@@ -133,7 +130,6 @@ export class GenericEntityFormComponent {
         nombre: value.nombre,
         apellido: value.apellido,
         email: value.email,
-        numeroEmpleado: value.numeroEmpleado,
         turno: value.turno,
         cajaAsignada: value.cajaAsignada,
       };

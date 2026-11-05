@@ -18,7 +18,15 @@ export class ProductFormComponent {
   readonly id = Number(this.route.snapshot.paramMap.get('id'));
   readonly error = signal('');
   file?: File;
-  readonly units: UnidadMedida[] = ['PIEZA', 'KILOGRAMO', 'LITRO', 'METRO'];
+  readonly units: UnidadMedida[] = [
+    'KILOGRAMO',
+    'GRAMO',
+    'LITRO',
+    'MILILITRO',
+    'METRO',
+    'CENTIMETRO',
+    'PIEZA',
+  ];
   readonly form = this.fb.nonNullable.group({
     nombre: ['', Validators.required],
     descripcion: ['', Validators.required],

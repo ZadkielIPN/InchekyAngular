@@ -114,7 +114,7 @@ export const routes: Routes = [
       {
         path: 'promociones',
         component: GenericEntityListComponent,
-        canActivate: [roleGuard(['ADMINISTRADOR'])],
+        canActivate: [roleGuard(['ADMINISTRADOR', 'CAJERO'])],
         data: {
           title: 'Promociones',
           endpoint: 'promociones',
@@ -140,7 +140,7 @@ export const routes: Routes = [
         data: {
           title: 'Ventas',
           endpoint: 'ventas',
-          columns: ['fecha', 'cajeroNombre', 'clienteNombre', 'total', 'metodoPago'],
+          columns: ['fecha', 'cajeroNombre', 'clienteNombre', 'total', 'descuentoPorPuntos', 'puntosGanados', 'metodoPago'],
           canEdit: false,
           canDelete: false,
         },
