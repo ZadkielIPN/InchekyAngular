@@ -142,6 +142,7 @@ export const routes: Routes = [
           endpoint: 'ventas',
           columns: ['fecha', 'cajeroNombre', 'clienteNombre', 'total', 'metodoPago'],
           canEdit: false,
+          canDelete: false,
         },
       },
       { path: 'ventas/nuevo', component: SaleFormComponent, canActivate: [roleGuard(['ADMINISTRADOR', 'CAJERO'])] },

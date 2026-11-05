@@ -18,6 +18,7 @@ export class GenericEntityListComponent {
   readonly columns = this.route.snapshot.data['columns'] as string[];
   readonly canCreate = this.route.snapshot.data['canCreate'] !== false;
   readonly canEdit = this.route.snapshot.data['canEdit'] !== false;
+  readonly canDelete = this.route.snapshot.data['canDelete'] !== false;
   readonly page = signal<PageResponse<Record<string, unknown>> | null>(null);
   readonly loading = signal(true);
   readonly error = signal('');
