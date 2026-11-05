@@ -1,13 +1,15 @@
 <section class="page">
   <div class="page-heading">
     <h1>Proveedores</h1>
-    <a class="primary" routerLink="/proveedores/nuevo">Nuevo proveedor</a>
+    <a class="btn btn-primary" routerLink="/proveedores/nuevo">
+      <i class="bi bi-plus-lg"></i> Nuevo proveedor
+    </a>
   </div>
   @if (loading()) {
     <app-loading />
   } @else {
     <div class="table-wrap card">
-      <table>
+      <table class="table table-hover align-middle mb-0">
         <thead>
           <tr>
             <th>Nombre</th>
@@ -27,8 +29,12 @@
               <td>{{ item.direccion }}</td>
               <td>{{ item.activo ? 'Sí' : 'No' }}</td>
               <td>
-                <a [routerLink]="['/proveedores', item.id, 'editar']">Editar</a>
-                <button (click)="remove(item.id)">Eliminar</button>
+                <a class="btn btn-sm btn-outline-primary me-1" [routerLink]="['/proveedores', item.id, 'editar']">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <button class="btn btn-sm btn-outline-danger" type="button" (click)="remove(item.id)">
+                  <i class="bi bi-trash"></i>
+                </button>
               </td>
             </tr>
           } @empty {
@@ -40,9 +46,9 @@
       </table>
     </div>
     <div class="pagination">
-      <button (click)="previous()" [disabled]="!page">Anterior</button
-      ><span>Página {{ page + 1 }} de {{ data()?.totalPages }}</span
-      ><button (click)="next()" [disabled]="data()?.last">Siguiente</button>
+      <button class="btn btn-outline-secondary" type="button" (click)="previous()" [disabled]="!page">Anterior</button>
+      <span>Página {{ page + 1 }} de {{ data()?.totalPages }}</span>
+      <button class="btn btn-outline-secondary" type="button" (click)="next()" [disabled]="data()?.last">Siguiente</button>
     </div>
   }
 </section>

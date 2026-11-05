@@ -17,7 +17,7 @@
         <form class="ticket-search" (ngSubmit)="searchProducts()">
           <i class="bi bi-search"></i>
           <input class="form-control" name="search" [ngModel]="searchQuery()"
-                 (ngModelChange)="searchQuery.set($event)" placeholder="Nombre o código..." />
+                 (ngModelChange)="searchQuery.set($event); searchProducts()" placeholder="Nombre o código..." />
         </form>
       </div>
       <div class="ticket-product-grid">
