@@ -57,6 +57,44 @@ export const routes: Routes = [
         },
       },
       {
+        path: 'cajeros',
+        component: GenericEntityListComponent,
+        data: {
+          title: 'Cajeros',
+          endpoint: 'cajeros',
+          columns: ['nombre', 'apellido', 'email', 'numeroEmpleado', 'turno', 'cajaAsignada'],
+        },
+      },
+      {
+        path: 'cajeros/nuevo',
+        component: GenericEntityFormComponent,
+        data: { title: 'cajero', endpoint: 'cajeros' },
+      },
+      {
+        path: 'cajeros/:id/editar',
+        component: GenericEntityFormComponent,
+        data: { title: 'cajero', endpoint: 'cajeros' },
+      },
+      {
+        path: 'administradores',
+        component: GenericEntityListComponent,
+        data: {
+          title: 'Administradores',
+          endpoint: 'administradores',
+          columns: ['nombre', 'apellido', 'email', 'numeroAdministrador'],
+        },
+      },
+      {
+        path: 'administradores/nuevo',
+        component: GenericEntityFormComponent,
+        data: { title: 'administrador', endpoint: 'administradores' },
+      },
+      {
+        path: 'administradores/:id/editar',
+        component: GenericEntityFormComponent,
+        data: { title: 'administrador', endpoint: 'administradores' },
+      },
+      {
         path: 'promociones',
         component: GenericEntityListComponent,
         data: {

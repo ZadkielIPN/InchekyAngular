@@ -10,7 +10,7 @@
         <input id="nombre" class="form-control" formControlName="nombre" />
       </div>
 
-      @if (endpoint === 'clientes') {
+      @if (endpoint === 'clientes' || endpoint === 'cajeros' || endpoint === 'administradores') {
         <div class="col-md-6">
           <label class="form-label" for="apellido">Apellido</label>
           <input id="apellido" class="form-control" formControlName="apellido" />
@@ -35,6 +35,24 @@
             {{ id ? 'Déjala vacía para conservar la contraseña actual.' : 'Debe tener entre 8 y 20 caracteres.' }}
           </small>
         </div>
+        @if (endpoint === 'cajeros') {
+          <div class="col-md-4">
+            <label class="form-label" for="numeroEmpleado">Número de empleado</label>
+            <input id="numeroEmpleado" class="form-control" type="number" min="1" formControlName="numeroEmpleado" />
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="turno">Turno</label>
+            <select id="turno" class="form-select" formControlName="turno">
+              <option value="MATUTINO">Matutino</option>
+              <option value="VESPERTINO">Vespertino</option>
+              <option value="NOCTURNO">Nocturno</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="cajaAsignada">Caja asignada</label>
+            <input id="cajaAsignada" class="form-control" type="number" min="1" formControlName="cajaAsignada" />
+          </div>
+        }
         <div class="col-md-3">
           <label class="form-label" for="puntos">Puntos</label>
           <input id="puntos" class="form-control" type="number" formControlName="puntos" />
