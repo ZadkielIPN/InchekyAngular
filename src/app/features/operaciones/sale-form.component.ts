@@ -2,6 +2,7 @@ import { CurrencyPipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { Cajero, Cliente, Producto } from '../../core/models/api.models';
 import { OperationService } from './operation.service';
@@ -37,9 +38,20 @@ export class SaleFormComponent {
     this.ticket().reduce((sum, item) => sum + item.producto.precio * item.cantidad, 0),
   );
   readonly currentUser = this.auth.currentUser;
+  private readonly search$ = new Subject<string>();
 
   constructor() {
     this.loadProducts();
+    this.search$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((query) => this.service.catalogProducts(query)),
+      )
+      .subscribe({
+        next: (page) => this.products.set(page.content),
+        error: () => this.error.set('No se pudo cargar el catálogo de productos.'),
+      });
     this.service.clients().subscribe((page) => this.clients.set(page.content));
     if (this.auth.hasRole('ADMINISTRADOR')) {
       this.service.cashiers().subscribe((page) => this.cashiers.set(page.content));
@@ -49,7 +61,7 @@ export class SaleFormComponent {
   }
 
   searchProducts() {
-    this.loadProducts(this.searchQuery());
+    this.search$.next(this.searchQuery().trim());
   }
 
   addProduct(product: Producto) {

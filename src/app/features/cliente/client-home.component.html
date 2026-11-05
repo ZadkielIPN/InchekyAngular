@@ -29,12 +29,16 @@
   </div>
 
   @if (error()) { <div class="notice error">{{ error() }}</div> }
-  @if (loading()) {
-    <div class="empty-state"><span class="spinner-border text-primary"></span><p>Cargando productos...</p></div>
-  } @else if (productos().length === 0) {
+  @if (loading() && productos().length === 0) {
+    <div class="catalog-results loading-state"><span class="spinner-border text-primary"></span><p>Cargando productos...</p></div>
+  } @else if (!loading() && productos().length === 0) {
     <div class="empty-state"><i class="bi bi-box-seam"></i><p>No encontramos productos disponibles.</p></div>
   } @else {
-    <div class="product-grid">
+    <div class="catalog-results" [class.is-loading]="loading()">
+      @if (loading()) {
+        <div class="catalog-loading"><span class="spinner-border spinner-border-sm text-primary"></span> Actualizando...</div>
+      }
+      <div class="product-grid">
       @for (producto of productos(); track producto.id) {
         <article class="card product-card">
           <img [src]="imageUrl(producto)" [alt]="producto.nombre" />
@@ -46,6 +50,7 @@
           </div>
         </article>
       }
+      </div>
     </div>
   }
 </main>
