@@ -23,7 +23,6 @@ export class GenericEntityFormComponent {
     apellido: [''],
     email: ['', Validators.email],
     contrasena: [''],
-    rol: ['CLIENTE'],
     telefono: [''],
     direccion: [''],
     puntos: [0],
@@ -37,11 +36,11 @@ export class GenericEntityFormComponent {
     if (this.endpoint === 'clientes') {
       this.form.controls.apellido.addValidators(Validators.required);
       this.form.controls.email.addValidators(Validators.required);
-      this.form.controls.contrasena.addValidators([
-        Validators.required,
-        Validators.minLength(8),
-        Validators.maxLength(20),
-      ]);
+      this.form.controls.contrasena.addValidators(
+        this.id
+          ? Validators.pattern(/^$|^.{8,20}$/)
+          : [Validators.required, Validators.minLength(8), Validators.maxLength(20)],
+      );
       this.form.controls.apellido.updateValueAndValidity();
       this.form.controls.email.updateValueAndValidity();
       this.form.controls.contrasena.updateValueAndValidity();
@@ -71,15 +70,19 @@ export class GenericEntityFormComponent {
     const value = this.form.getRawValue();
 
     if (this.endpoint === 'clientes') {
-      return {
+      const payload: Record<string, unknown> = {
         nombre: value.nombre,
         apellido: value.apellido,
         email: value.email,
-        contrasena: value.contrasena,
-        rol: 'CLIENTE',
         puntos: value.puntos,
         nivelLealtad: value.nivelLealtad,
       };
+
+      if (!this.id || value.contrasena.trim()) {
+        payload['contrasena'] = value.contrasena;
+      }
+
+      return payload;
     }
 
     return {

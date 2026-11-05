@@ -20,7 +20,9 @@
           <input id="email" class="form-control" type="email" formControlName="email" />
         </div>
         <div class="col-md-6">
-          <label class="form-label" for="contrasena">Contraseña</label>
+          <label class="form-label" for="contrasena">
+            {{ id ? 'Nueva contraseña (opcional)' : 'Contraseña' }}
+          </label>
           <input
             id="contrasena"
             class="form-control"
@@ -28,9 +30,10 @@
             formControlName="contrasena"
             minlength="8"
             maxlength="20"
-            required
           />
-          <small class="form-text text-muted">Debe tener entre 8 y 20 caracteres.</small>
+          <small class="form-text text-muted">
+            {{ id ? 'Déjala vacía para conservar la contraseña actual.' : 'Debe tener entre 8 y 20 caracteres.' }}
+          </small>
         </div>
         <div class="col-md-3">
           <label class="form-label" for="puntos">Puntos</label>
