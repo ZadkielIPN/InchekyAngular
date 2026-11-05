@@ -20,7 +20,7 @@ export class LoginComponent {
     this.error.set('');
     this.auth.login(this.email, this.contrasena).subscribe({
       next: () => void this.router.navigate(['/']),
-      error: (error) => this.error.set(error.error?.message ?? 'No se pudo iniciar sesión.'),
+      error: (error) => this.error.set(this.auth.getLoginErrorMessage(error)),
     });
   }
 }

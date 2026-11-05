@@ -1,7 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, finalize, map, of, tap } from 'rxjs';
+import { catchError, finalize, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { UsuarioSession } from '../models/api.models';
 
@@ -17,7 +17,10 @@ export class AuthService {
   login(email: string, contrasena: string) {
     this.loading.set(true);
     return this.http
-      .post<UsuarioSession>(`${environment.apiUrl}/auth/login`, { email, contrasena })
+      .post<UsuarioSession>(`${environment.apiUrl}/auth/login`, {
+        email: email.trim(),
+        contrasena,
+      })
       .pipe(
         tap((user) => {
           this.session.set(user);
@@ -25,6 +28,32 @@ export class AuthService {
         }),
         finalize(() => this.loading.set(false)),
       );
+  }
+
+  getLoginErrorMessage(error: unknown): string {
+    if (!(error instanceof HttpErrorResponse)) {
+      return 'No se pudo procesar el inicio de sesión.';
+    }
+
+    const serverMessage = this.readServerMessage(error);
+
+    if (serverMessage) {
+      return serverMessage;
+    }
+
+    if (error.status === 0) {
+      return 'No se pudo conectar con el backend. Verifica que Spring Boot esté ejecutándose en el puerto 8080.';
+    }
+
+    if (error.status === 404) {
+      return 'La ruta de login no está disponible en el backend. Reinicia Spring Boot y verifica /api/auth/login.';
+    }
+
+    if (error.status === 405) {
+      return 'El backend recibió un método HTTP incorrecto para la ruta de login.';
+    }
+
+    return `No se pudo iniciar sesión (HTTP ${error.status}).`;
   }
 
   logout() {
@@ -49,5 +78,19 @@ export class AuthService {
     } catch {
       return null;
     }
+  }
+
+  private readServerMessage(error: HttpErrorResponse): string | null {
+    const body = error.error;
+
+    if (typeof body === 'string' && body.trim()) {
+      return body;
+    }
+
+    if (body && typeof body.message === 'string' && body.message.trim()) {
+      return body.message;
+    }
+
+    return null;
   }
 }
