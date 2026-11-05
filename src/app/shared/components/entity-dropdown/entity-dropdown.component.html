@@ -1,0 +1,71 @@
+<div class="entity-dropdown" [class.is-open]="open()" [class.is-disabled]="disabled()">
+  <button
+    class="entity-dropdown-trigger"
+    type="button"
+    [disabled]="disabled()"
+    [attr.aria-expanded]="open()"
+    (click)="toggle()"
+  >
+    <span class="entity-dropdown-trigger-content">
+      <i class="bi" [class]="selectedOptions.length ? (selectedOptions[0].icon ?? icon) : icon"></i>
+      @if (selectedOptions.length === 0) {
+        <span class="entity-dropdown-placeholder">{{ placeholder }}</span>
+      } @else if (multiple) {
+        <span class="entity-dropdown-selected-count">{{ selectedOptions.length }} seleccionados</span>
+      } @else {
+        <span>{{ selectedOptions[0].label }}</span>
+      }
+    </span>
+    <i class="bi bi-chevron-down entity-dropdown-chevron"></i>
+  </button>
+
+  @if (open()) {
+    <div class="entity-dropdown-menu" role="listbox" [attr.aria-multiselectable]="multiple">
+      <div class="entity-dropdown-search">
+        <i class="bi bi-search"></i>
+        <input
+          type="search"
+          [ngModel]="query()"
+          (ngModelChange)="query.set($event)"
+          [placeholder]="searchPlaceholder"
+          aria-label="Filtrar opciones"
+        />
+      </div>
+
+      @if (multiple && selectedOptions.length) {
+        <div class="entity-dropdown-chips">
+          @for (option of selectedOptions; track option.id) {
+            <button type="button" class="entity-dropdown-chip" (click)="remove(option.id, $event)">
+              {{ option.label }} <i class="bi bi-x-lg"></i>
+            </button>
+          }
+        </div>
+      }
+
+      <div class="entity-dropdown-options">
+        @for (option of filteredOptions; track option.id) {
+          <button
+            type="button"
+            class="entity-dropdown-option"
+            [class.is-selected]="selectedIds.includes(option.id)"
+            (click)="select(option)"
+          >
+            <i class="bi" [class]="option.icon ?? icon"></i>
+            <span class="entity-dropdown-option-text">
+              <strong>{{ option.label }}</strong>
+              @if (option.secondary) { <small>{{ option.secondary }}</small> }
+            </span>
+            @if (selectedIds.includes(option.id)) {
+              <i class="bi bi-check2 entity-dropdown-check"></i>
+            }
+          </button>
+        } @empty {
+          <div class="entity-dropdown-empty">
+            <i class="bi bi-search"></i>
+            <span>No se encontraron opciones.</span>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

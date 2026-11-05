@@ -3,11 +3,15 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { OperationService } from './operation.service';
 import { Producto, Proveedor } from '../../core/models/api.models';
+import {
+  EntityDropdownComponent,
+  EntityDropdownOption,
+} from '../../shared/components/entity-dropdown/entity-dropdown.component';
 
 @Component({
   selector: 'app-supply-form',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, EntityDropdownComponent],
   templateUrl: './supply-form.component.html',
 })
 export class SupplyFormComponent {
@@ -18,6 +22,8 @@ export class SupplyFormComponent {
   readonly error = signal('');
   readonly products = signal<Producto[]>([]);
   readonly providers = signal<Proveedor[]>([]);
+  readonly providerOptions = signal<EntityDropdownOption[]>([]);
+  readonly productOptions = signal<EntityDropdownOption[]>([]);
 
   readonly form = this.fb.nonNullable.group({
     fecha: [new Date().toISOString().slice(0, 16), Validators.required],
@@ -26,8 +32,24 @@ export class SupplyFormComponent {
   });
 
   constructor() {
-    this.service.products().subscribe((page) => this.products.set(page.content));
-    this.service.providers().subscribe((page) => this.providers.set(page.content));
+    this.service.products().subscribe((page) => {
+      this.products.set(page.content);
+      this.productOptions.set(page.content.map((product) => ({
+        id: product.id,
+        label: product.nombre,
+        secondary: `${product.codigoBarras} · Stock ${product.stock}`,
+        icon: 'bi-box-seam',
+      })));
+    });
+    this.service.providers().subscribe((page) => {
+      this.providers.set(page.content);
+      this.providerOptions.set(page.content.map((provider) => ({
+        id: provider.id,
+        label: provider.nombre,
+        secondary: provider.email,
+        icon: 'bi-truck',
+      })));
+    });
   }
 
   get details() {

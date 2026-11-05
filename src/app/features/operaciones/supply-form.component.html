@@ -14,12 +14,13 @@
       </div>
       <div class="col-md-6">
         <label class="form-label" for="proveedorId">Proveedor</label>
-        <select id="proveedorId" class="form-select" formControlName="proveedorId">
-          <option [ngValue]="0">Selecciona un proveedor</option>
-          @for (provider of providers(); track provider.id) {
-            <option [ngValue]="provider.id">{{ provider.nombre }}</option>
-          }
-        </select>
+        <app-entity-dropdown
+          formControlName="proveedorId"
+          [options]="providerOptions()"
+          placeholder="Selecciona un proveedor"
+          searchPlaceholder="Filtrar proveedores por nombre..."
+          icon="bi-truck"
+        />
       </div>
     </div>
 
@@ -38,12 +39,13 @@
         <div class="row g-2 align-items-end" [formGroupName]="$index">
           <div class="col-md-6">
             <label class="form-label">Producto</label>
-            <select class="form-select" formControlName="productoId">
-              <option [ngValue]="0">Selecciona un producto</option>
-              @for (product of products(); track product.id) {
-                <option [ngValue]="product.id">{{ product.nombre }}</option>
-              }
-            </select>
+            <app-entity-dropdown
+              formControlName="productoId"
+              [options]="productOptions()"
+              placeholder="Selecciona un producto"
+              searchPlaceholder="Filtrar productos por nombre o código..."
+              icon="bi-box-seam"
+            />
           </div>
           <div class="col-md-2">
             <label class="form-label">Cantidad</label>

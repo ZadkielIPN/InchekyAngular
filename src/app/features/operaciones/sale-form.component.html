@@ -43,23 +43,27 @@
 
       <div class="ticket-fields">
         <label class="form-label" for="cliente">Cliente *</label>
-        <select id="cliente" class="form-select" [ngModel]="selectedClientId()"
-                (ngModelChange)="onClientChange($event ? +$event : null)" name="cliente">
-          <option [ngValue]="null">Selecciona un cliente</option>
-          @for (client of clients(); track client.id) {
-            <option [ngValue]="client.id">{{ client.nombre }} {{ client.apellido }} · {{ client.email }}</option>
-          }
-        </select>
+        <app-entity-dropdown
+          [options]="clientOptions()"
+          placeholder="Selecciona un cliente"
+          searchPlaceholder="Filtrar clientes por nombre o correo..."
+          icon="bi-person"
+          [ngModel]="selectedClientId()"
+          (ngModelChange)="onClientChange($event)"
+          name="cliente"
+        />
 
         @if (auth.hasRole('ADMINISTRADOR')) {
           <label class="form-label" for="cajero">Cajero *</label>
-          <select id="cajero" class="form-select" [ngModel]="selectedCashierId()"
-                  (ngModelChange)="selectedCashierId.set($event ? +$event : null)" name="cajero">
-            <option [ngValue]="null">Selecciona un cajero</option>
-            @for (cashier of cashiers(); track cashier.id) {
-              <option [ngValue]="cashier.id">{{ cashier.nombre }} {{ cashier.apellido }}</option>
-            }
-          </select>
+          <app-entity-dropdown
+            [options]="cashierOptions()"
+            placeholder="Selecciona un cajero"
+            searchPlaceholder="Filtrar cajeros por nombre..."
+            icon="bi-person-badge"
+            [ngModel]="selectedCashierId()"
+            (ngModelChange)="selectedCashierId.set($event)"
+            name="cajero"
+          />
         }
 
         <label class="form-label" for="metodoPago">Método de pago</label>
