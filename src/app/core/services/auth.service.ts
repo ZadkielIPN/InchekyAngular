@@ -16,13 +16,15 @@ export class AuthService {
 
   login(email: string, contrasena: string) {
     this.loading.set(true);
-    return this.http.post<UsuarioSession>(`${environment.apiUrl}/auth/login`, { email, contrasena }).pipe(
-      tap((user) => {
-        this.session.set(user);
-        localStorage.setItem('incheky-session', JSON.stringify(user));
-      }),
-      finalize(() => this.loading.set(false)),
-    );
+    return this.http
+      .post<UsuarioSession>(`${environment.apiUrl}/auth/login`, { email, contrasena })
+      .pipe(
+        tap((user) => {
+          this.session.set(user);
+          localStorage.setItem('incheky-session', JSON.stringify(user));
+        }),
+        finalize(() => this.loading.set(false)),
+      );
   }
 
   logout() {

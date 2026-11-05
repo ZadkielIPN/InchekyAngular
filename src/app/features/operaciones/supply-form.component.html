@@ -1,0 +1,83 @@
+<main class="page">
+  <div class="page-heading">
+    <div>
+      <h1>Nuevo abastecimiento</h1>
+      <p class="muted mb-0">Registra la entrada de productos al inventario.</p>
+    </div>
+  </div>
+
+  <form class="panel" [formGroup]="form" (ngSubmit)="save()">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label" for="fecha">Fecha</label>
+        <input id="fecha" class="form-control" type="datetime-local" formControlName="fecha" />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="proveedorId">Proveedor</label>
+        <select id="proveedorId" class="form-select" formControlName="proveedorId">
+          <option [ngValue]="0">Selecciona un proveedor</option>
+          @for (provider of providers(); track provider.id) {
+            <option [ngValue]="provider.id">{{ provider.nombre }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <hr class="my-4" />
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="h5 mb-0">Detalle de abastecimiento</h2>
+      <button class="btn btn-outline-primary btn-sm" type="button" (click)="addDetail()">
+        <i class="bi bi-plus-lg"></i>
+        Agregar producto
+      </button>
+    </div>
+
+    <div formArrayName="detalles" class="vstack gap-3">
+      @for (detail of details.controls; track $index) {
+        <div class="row g-2 align-items-end" [formGroupName]="$index">
+          <div class="col-md-6">
+            <label class="form-label">Producto</label>
+            <select class="form-select" formControlName="productoId">
+              <option [ngValue]="0">Selecciona un producto</option>
+              @for (product of products(); track product.id) {
+                <option [ngValue]="product.id">{{ product.nombre }}</option>
+              }
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Cantidad</label>
+            <input class="form-control" type="number" min="1" formControlName="cantidad" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Costo unitario</label>
+            <input
+              class="form-control"
+              type="number"
+              min="0"
+              step="0.01"
+              formControlName="costoUnitario"
+            />
+          </div>
+          <div class="col-md-1">
+            <button class="btn btn-outline-danger" type="button" (click)="removeDetail($index)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (error()) {
+      <div class="notice error mt-4" role="alert">{{ error() }}</div>
+    }
+
+    <div class="d-flex gap-2 mt-4">
+      <button class="btn btn-primary" type="submit">
+        <i class="bi bi-check-lg"></i>
+        Registrar abastecimiento
+      </button>
+      <a class="btn btn-outline-secondary" routerLink="/abastecimientos">Cancelar</a>
+    </div>
+  </form>
+</main>

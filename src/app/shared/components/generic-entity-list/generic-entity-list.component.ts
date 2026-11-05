@@ -17,6 +17,7 @@ export class GenericEntityListComponent {
   readonly endpoint = this.route.snapshot.data['endpoint'] as string;
   readonly columns = this.route.snapshot.data['columns'] as string[];
   readonly canCreate = this.route.snapshot.data['canCreate'] !== false;
+  readonly canEdit = this.route.snapshot.data['canEdit'] !== false;
   readonly page = signal<PageResponse<Record<string, unknown>> | null>(null);
   readonly loading = signal(true);
   readonly error = signal('');
@@ -40,6 +41,17 @@ export class GenericEntityListComponent {
     this.api.delete(`${this.endpoint}/${id}`).subscribe({ next: () => this.load() });
   }
 
-  next() { if (this.page() && !this.page()!.last) { this.currentPage++; this.load(); } }
-  previous() { if (this.currentPage > 0) { this.currentPage--; this.load(); } }
+  next() {
+    if (this.page() && !this.page()!.last) {
+      this.currentPage++;
+      this.load();
+    }
+  }
+
+  previous() {
+    if (this.currentPage > 0) {
+      this.currentPage--;
+      this.load();
+    }
+  }
 }

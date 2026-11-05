@@ -1,6 +1,76 @@
-<section class="page"><h1>{{ id ? 'Editar' : 'Nuevo' }} {{ title }}</h1><form class="card form-grid" [formGroup]="form" (ngSubmit)="save()">
-  <label>Nombre<input formControlName="nombre"></label>
-  @if(endpoint === 'clientes'){<label>Apellido<input formControlName="apellido"></label><label>Email<input type="email" formControlName="email"></label><label>Puntos<input type="number" formControlName="puntos"></label><label>Nivel<select formControlName="nivelLealtad"><option>BRONCE</option><option>PLATA</option><option>ORO</option><option>PLATINO</option></select></label>}
-  @if(endpoint === 'promociones'){<label>Descuento (%)<input type="number" formControlName="porcentajeDescuento"></label><label>Fecha inicio<input type="date" formControlName="fechaInicio"></label><label>Fecha fin<input type="date" formControlName="fechaFin"></label><label class="checkbox"><input type="checkbox" formControlName="activa"> Activa</label>}
-  @if(error()){<div class="error">{{error()}}</div>}<div><button class="primary" type="submit">Guardar</button> <a [routerLink]="['/', endpoint]">Cancelar</a></div>
-</form></section>
+<main class="page">
+  <div class="page-heading">
+    <h1>{{ id ? 'Editar' : 'Nuevo' }} {{ title }}</h1>
+  </div>
+
+  <form class="panel" [formGroup]="form" (ngSubmit)="save()">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label" for="nombre">Nombre</label>
+        <input id="nombre" class="form-control" formControlName="nombre" />
+      </div>
+
+      @if (endpoint === 'clientes') {
+        <div class="col-md-6">
+          <label class="form-label" for="apellido">Apellido</label>
+          <input id="apellido" class="form-control" formControlName="apellido" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="email">Correo electrónico</label>
+          <input id="email" class="form-control" type="email" formControlName="email" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="puntos">Puntos</label>
+          <input id="puntos" class="form-control" type="number" formControlName="puntos" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="nivelLealtad">Nivel</label>
+          <select id="nivelLealtad" class="form-select" formControlName="nivelLealtad">
+            <option value="BRONCE">Bronce</option>
+            <option value="PLATA">Plata</option>
+            <option value="ORO">Oro</option>
+            <option value="PLATINO">Platino</option>
+          </select>
+        </div>
+      }
+
+      @if (endpoint === 'promociones') {
+        <div class="col-md-4">
+          <label class="form-label" for="porcentajeDescuento">Descuento (%)</label>
+          <input
+            id="porcentajeDescuento"
+            class="form-control"
+            type="number"
+            min="0"
+            max="100"
+            formControlName="porcentajeDescuento"
+          />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="fechaInicio">Fecha de inicio</label>
+          <input id="fechaInicio" class="form-control" type="date" formControlName="fechaInicio" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="fechaFin">Fecha de fin</label>
+          <input id="fechaFin" class="form-control" type="date" formControlName="fechaFin" />
+        </div>
+        <div class="col-12 form-check ms-2">
+          <input id="activa" class="form-check-input" type="checkbox" formControlName="activa" />
+          <label class="form-check-label" for="activa">Promoción activa</label>
+        </div>
+      }
+    </div>
+
+    @if (error()) {
+      <div class="notice error mt-3" role="alert">{{ error() }}</div>
+    }
+
+    <div class="d-flex gap-2 mt-4">
+      <button class="btn btn-primary" type="submit">
+        <i class="bi bi-check-lg"></i>
+        Guardar
+      </button>
+      <a class="btn btn-outline-secondary" [routerLink]="['/', endpoint]">Cancelar</a>
+    </div>
+  </form>
+</main>

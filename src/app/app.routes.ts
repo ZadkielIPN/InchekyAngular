@@ -9,6 +9,8 @@ import { ProviderListComponent } from './features/proveedores/provider-list.comp
 import { ProviderFormComponent } from './features/proveedores/provider-form.component';
 import { GenericEntityListComponent } from './shared/components/generic-entity-list/generic-entity-list.component';
 import { GenericEntityFormComponent } from './shared/components/generic-entity-form/generic-entity-form.component';
+import { SaleFormComponent } from './features/operaciones/sale-form.component';
+import { SupplyFormComponent } from './features/operaciones/supply-form.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -24,15 +26,77 @@ export const routes: Routes = [
       { path: 'proveedores', component: ProviderListComponent },
       { path: 'proveedores/nuevo', component: ProviderFormComponent },
       { path: 'proveedores/:id/editar', component: ProviderFormComponent },
-      { path: 'clientes', component: GenericEntityListComponent, data: { title: 'Clientes', endpoint: 'clientes', columns: ['nombre','apellido','email','puntos','nivelLealtad'] } },
-      { path: 'clientes/nuevo', component: GenericEntityFormComponent, data: { title: 'cliente', endpoint: 'clientes' } },
-      { path: 'clientes/:id/editar', component: GenericEntityFormComponent, data: { title: 'cliente', endpoint: 'clientes' } },
-      { path: 'usuarios', component: GenericEntityListComponent, data: { title: 'Usuarios', endpoint: 'usuarios', columns: ['nombre','apellido','email','rol'] } },
-      { path: 'promociones', component: GenericEntityListComponent, data: { title: 'Promociones', endpoint: 'promociones', columns: ['nombre','porcentajeDescuento','fechaInicio','fechaFin','activa'] } },
-      { path: 'promociones/nuevo', component: GenericEntityFormComponent, data: { title: 'promoción', endpoint: 'promociones' } },
-      { path: 'promociones/:id/editar', component: GenericEntityFormComponent, data: { title: 'promoción', endpoint: 'promociones' } },
-      { path: 'ventas', component: GenericEntityListComponent, data: { title: 'Ventas', endpoint: 'ventas', columns: ['fecha','cajeroId','clienteId','total','metodoPago'], canCreate: false } },
-      { path: 'abastecimientos', component: GenericEntityListComponent, data: { title: 'Abastecimientos', endpoint: 'abastecimientos', columns: ['fecha','proveedorId','total'], canCreate: false } },
+      {
+        path: 'clientes',
+        component: GenericEntityListComponent,
+        data: {
+          title: 'Clientes',
+          endpoint: 'clientes',
+          columns: ['nombre', 'apellido', 'email', 'puntos', 'nivelLealtad'],
+        },
+      },
+      {
+        path: 'clientes/nuevo',
+        component: GenericEntityFormComponent,
+        data: { title: 'cliente', endpoint: 'clientes' },
+      },
+      {
+        path: 'clientes/:id/editar',
+        component: GenericEntityFormComponent,
+        data: { title: 'cliente', endpoint: 'clientes' },
+      },
+      {
+        path: 'usuarios',
+        component: GenericEntityListComponent,
+        data: {
+          title: 'Usuarios',
+          endpoint: 'usuarios',
+          columns: ['nombre', 'apellido', 'email', 'rol'],
+          canCreate: false,
+          canEdit: false,
+        },
+      },
+      {
+        path: 'promociones',
+        component: GenericEntityListComponent,
+        data: {
+          title: 'Promociones',
+          endpoint: 'promociones',
+          columns: ['nombre', 'porcentajeDescuento', 'fechaInicio', 'fechaFin', 'activa'],
+        },
+      },
+      {
+        path: 'promociones/nuevo',
+        component: GenericEntityFormComponent,
+        data: { title: 'promoción', endpoint: 'promociones' },
+      },
+      {
+        path: 'promociones/:id/editar',
+        component: GenericEntityFormComponent,
+        data: { title: 'promoción', endpoint: 'promociones' },
+      },
+      {
+        path: 'ventas',
+        component: GenericEntityListComponent,
+        data: {
+          title: 'Ventas',
+          endpoint: 'ventas',
+          columns: ['fecha', 'cajeroId', 'clienteId', 'total', 'metodoPago'],
+          canEdit: false,
+        },
+      },
+      { path: 'ventas/nuevo', component: SaleFormComponent },
+      {
+        path: 'abastecimientos',
+        component: GenericEntityListComponent,
+        data: {
+          title: 'Abastecimientos',
+          endpoint: 'abastecimientos',
+          columns: ['fecha', 'proveedorId', 'total'],
+          canEdit: false,
+        },
+      },
+      { path: 'abastecimientos/nuevo', component: SupplyFormComponent },
     ],
   },
   { path: '**', redirectTo: '' },

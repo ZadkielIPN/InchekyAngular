@@ -10,4 +10,8 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class LayoutComponent {
   readonly auth = inject(AuthService);
+
+  canAccess(...roles: string[]) {
+    return this.auth.hasRole(...roles);
+  }
 }

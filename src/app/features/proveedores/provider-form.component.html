@@ -1,1 +1,42 @@
-<section class="page"><h1>{{ id ? 'Editar' : 'Nuevo' }} proveedor</h1><form class="card form-grid" [formGroup]="form" (ngSubmit)="save()"><label>Nombre<input formControlName="nombre"></label><label>Teléfono<input formControlName="telefono"></label><label>Email<input type="email" formControlName="email"></label><label>Dirección<textarea formControlName="direccion"></textarea></label><label class="checkbox"><input type="checkbox" formControlName="activo"> Activo</label>@if(error()){<div class="error">{{error()}}</div>}<div><button class="primary" type="submit">Guardar</button> <a routerLink="/proveedores">Cancelar</a></div></form></section>
+<main class="page">
+  <div class="page-heading">
+    <h1>{{ id ? 'Editar' : 'Nuevo' }} proveedor</h1>
+  </div>
+
+  <form class="panel" [formGroup]="form" (ngSubmit)="save()">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label" for="nombre">Nombre</label>
+        <input id="nombre" class="form-control" formControlName="nombre" />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="telefono">Teléfono</label>
+        <input id="telefono" class="form-control" formControlName="telefono" />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="email">Correo electrónico</label>
+        <input id="email" class="form-control" type="email" formControlName="email" />
+      </div>
+      <div class="col-12">
+        <label class="form-label" for="direccion">Dirección</label>
+        <textarea id="direccion" class="form-control" rows="3" formControlName="direccion"></textarea>
+      </div>
+      <div class="col-12 form-check ms-2">
+        <input id="activo" class="form-check-input" type="checkbox" formControlName="activo" />
+        <label class="form-check-label" for="activo">Proveedor activo</label>
+      </div>
+    </div>
+
+    @if (error()) {
+      <div class="notice error mt-3" role="alert">{{ error() }}</div>
+    }
+
+    <div class="d-flex gap-2 mt-4">
+      <button class="btn btn-primary" type="submit">
+        <i class="bi bi-check-lg"></i>
+        Guardar
+      </button>
+      <a class="btn btn-outline-secondary" routerLink="/proveedores">Cancelar</a>
+    </div>
+  </form>
+</main>
