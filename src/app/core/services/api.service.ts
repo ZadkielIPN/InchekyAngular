@@ -8,7 +8,12 @@ export class ApiService {
   private readonly http = inject(HttpClient);
   readonly baseUrl = environment.apiUrl;
 
-  list<T>(path: string, page = 0, size = 10, extra: Record<string, string | number | undefined> = {}) {
+  list<T>(
+    path: string,
+    page = 0,
+    size = 10,
+    extra: Record<string, string | number | undefined> = {},
+  ) {
     let params = new HttpParams().set('page', page).set('size', size);
     Object.entries(extra).forEach(([key, value]) => {
       if (value !== undefined && value !== '') params = params.set(key, value);

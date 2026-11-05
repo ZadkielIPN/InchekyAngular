@@ -1,40 +1,87 @@
-<section class="page">
+<main class="page">
   <div class="page-heading">
-    <h1>{{ title }}</h1>
-    @if(canCreate){
-      <a class="primary" [routerLink]="['/', endpoint, 'nuevo']">Nuevo</a>
+    <div>
+      <h1>{{ title }}</h1>
+      <p class="muted mb-0">Consulta y administra la información registrada.</p>
+    </div>
+    @if (canCreate) {
+      <a class="btn btn-primary" [routerLink]="['/', endpoint, 'nuevo']">
+        <i class="bi bi-plus-lg"></i>
+        Nuevo
+      </a>
     }
   </div>
-  @if (loading()) { <app-loading /> } @else {
-    @if (error()) { <div class="error">{{ error() }}</div> }
-    <div class="table-wrap card">
-      <table>
+
+  @if (loading()) {
+    <app-loading />
+  } @else {
+    @if (error()) {
+      <div class="notice error mb-3" role="alert">{{ error() }}</div>
+    }
+
+    <div class="card table-wrap">
+      <table class="table table-hover align-middle">
         <thead>
-        <tr>
-          @for (column of columns; track column) { <th>{{ column }}</th> }
-          <th>Acciones</th>
-        </tr>
+          <tr>
+            @for (column of columns; track column) {
+              <th scope="col">{{ column }}</th>
+            }
+            <th scope="col">Acciones</th>
+          </tr>
         </thead>
         <tbody>
           @for (item of page()?.content ?? []; track item['id']) {
             <tr>
-              @for (column of columns; track column) { <td>{{ item[column] }}</td> }
+              @for (column of columns; track column) {
+                <td>{{ item[column] }}</td>
+              }
               <td>
-                <button (click)="remove(item['id'])">Eliminar</button>
+                @if (canEdit) {
+                  <a
+                    class="btn btn-sm btn-outline-primary me-1"
+                    [routerLink]="['/', endpoint, item['id'], 'editar']"
+                  >
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                }
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  type="button"
+                  (click)="remove(item['id'])"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
               </td>
             </tr>
           } @empty {
             <tr>
-              <td [attr.colspan]="columns.length + 1">Sin registros.</td>
+              <td class="empty" [attr.colspan]="columns.length + 1">
+                No hay registros disponibles.
+              </td>
             </tr>
           }
         </tbody>
       </table>
     </div>
-    <div class="pagination">
-      <button (click)="previous()" [disabled]="currentPage===0">Anterior</button>
+
+    <div class="d-flex justify-content-center align-items-center gap-3 mt-3">
+      <button
+        class="btn btn-outline-secondary"
+        type="button"
+        (click)="previous()"
+        [disabled]="currentPage === 0"
+      >
+        Anterior
+      </button>
       <span>Página {{ (page()?.number ?? 0) + 1 }} de {{ page()?.totalPages ?? 1 }}</span>
-      <button (click)="next()" [disabled]="page()?.last">Siguiente</button>
+      <button
+        class="btn btn-outline-secondary"
+        type="button"
+        (click)="next()"
+        [disabled]="page()?.last"
+      >
+        Siguiente
+      </button>
     </div>
   }
-</section>
+</main>

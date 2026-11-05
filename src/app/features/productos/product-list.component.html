@@ -4,52 +4,52 @@
     <a class="primary" routerLink="/productos/nuevo">Nuevo producto</a>
   </div>
   <form class="search" (ngSubmit)="search()">
-    <input name="query" [(ngModel)]="query" placeholder="Buscar producto">
-    <button type="submit">Buscar</button>
+    <input name="query" [(ngModel)]="query" placeholder="Buscar producto" /><button type="submit">
+      Buscar
+    </button>
   </form>
-  @if(loading()) {<app-loading/>}
-  @else
-    {<div class="table-wrap card">
+  @if (loading()) {
+    <app-loading />
+  } @else {
+    <div class="table-wrap card">
       <table>
         <thead>
-        <tr>
-          <th>Producto</th>
-          <th>Código</th>
-          <th>Precio</th>
-          <th>Stock</th>
-          <th>Unidad</th>
-          <th>Activo</th>
-          <th></th>
-        </tr>
+          <tr>
+            <th>Producto</th>
+            <th>Código</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Unidad</th>
+            <th>Activo</th>
+            <th></th>
+          </tr>
         </thead>
         <tbody>
-          @for(item of data()?.content ?? []; track item.id) {
+          @for (item of data()?.content ?? []; track item.id) {
             <tr>
-              <td>{{item.nombre}}</td>
-              <td>{{item.codigoBarras}}</td>
-              <td>{{item.precio | number:'1.2-2'}}</td>
-              <td>{{item.stock}}</td>
-              <td>{{item.unidadMedida}}</td>
-              <td>{{item.activo?'Sí':'No'}}</td>
+              <td>{{ item.nombre }}</td>
+              <td>{{ item.codigoBarras }}</td>
+              <td>{{ item.precio | number: '1.2-2' }}</td>
+              <td>{{ item.stock }}</td>
+              <td>{{ item.unidadMedida }}</td>
+              <td>{{ item.activo ? 'Sí' : 'No' }}</td>
               <td>
-                <a [routerLink]="['/productos',item.id,'editar']">Editar</a>
+                <a [routerLink]="['/productos', item.id, 'editar']">Editar</a>
                 <button (click)="remove(item.id)">Eliminar</button>
               </td>
             </tr>
-          }
-          @empty {
+          } @empty {
             <tr>
-              <td colspan="7">
-                Sin registros.
-              </td>
+              <td colspan="7">Sin registros.</td>
             </tr>
           }
         </tbody>
       </table>
     </div>
-      <div class="pagination">
-        <button (click)="previous()" [disabled]="!page">Anterior</button>
-        <span>Página {{page+1}} de {{data()?.totalPages}}</span>
-        <button (click)="next()" [disabled]="data()?.last">Siguiente</button>
-      </div>}
+    <div class="pagination">
+      <button (click)="previous()" [disabled]="!page">Anterior</button
+      ><span>Página {{ page + 1 }} de {{ data()?.totalPages }}</span
+      ><button (click)="next()" [disabled]="data()?.last">Siguiente</button>
+    </div>
+  }
 </section>

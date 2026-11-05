@@ -1,23 +1,84 @@
 <div class="app-shell">
   <aside class="sidebar">
-    <h2>Incheky</h2>
-    <nav>
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Dashboard</a>
-      <a routerLink="/productos" routerLinkActive="active">Productos</a>
-      <a routerLink="/proveedores" routerLinkActive="active">Proveedores</a>
-      <a routerLink="/clientes" routerLinkActive="active">Clientes</a>
-      <a routerLink="/usuarios" routerLinkActive="active">Usuarios</a>
-      <a routerLink="/promociones" routerLinkActive="active">Promociones</a>
-      <a routerLink="/ventas" routerLinkActive="active">Ventas</a>
-      <a routerLink="/abastecimientos" routerLinkActive="active">Abastecimientos</a>
+    <a class="sidebar-brand" routerLink="/">
+      <span class="sidebar-brand-icon">
+        <i class="bi bi-shop"></i>
+      </span>
+      <span>Incheky</span>
+    </a>
+
+    <nav aria-label="Navegación principal">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <i class="bi bi-grid-1x2-fill"></i>
+        <span>Dashboard</span>
+      </a>
+      <a routerLink="/productos" routerLinkActive="active">
+        <i class="bi bi-box-seam"></i>
+        <span>Productos</span>
+      </a>
+      <a routerLink="/proveedores" routerLinkActive="active">
+        <i class="bi bi-truck"></i>
+        <span>Proveedores</span>
+      </a>
+      <a routerLink="/clientes" routerLinkActive="active">
+        <i class="bi bi-people"></i>
+        <span>Clientes</span>
+      </a>
+      @if (canAccess('ADMINISTRADOR')) {
+        <a routerLink="/usuarios" routerLinkActive="active">
+          <i class="bi bi-person-gear"></i>
+          <span>Usuarios</span>
+        </a>
+        <a routerLink="/promociones" routerLinkActive="active">
+          <i class="bi bi-percent"></i>
+          <span>Promociones</span>
+        </a>
+      }
+      @if (canAccess('ADMINISTRADOR', 'CAJERO')) {
+        <a routerLink="/ventas" routerLinkActive="active">
+          <i class="bi bi-receipt"></i>
+          <span>Ventas</span>
+        </a>
+        <a routerLink="/abastecimientos" routerLinkActive="active">
+          <i class="bi bi-boxes"></i>
+          <span>Abastecimientos</span>
+        </a>
+      }
     </nav>
-    <button class="logout" (click)="auth.logout().subscribe()">Cerrar sesión</button>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <strong>{{ auth.currentUser()?.nombre }}</strong>
+        <br />
+        {{ auth.currentUser()?.rol }}
+      </div>
+      <button
+        class="btn btn-outline-light btn-sm"
+        type="button"
+        (click)="auth.logout().subscribe()"
+      >
+        <i class="bi bi-box-arrow-right"></i>
+        Cerrar sesión
+      </button>
+    </div>
   </aside>
+
   <section class="content">
     <header class="topbar">
-      <span>{{ auth.currentUser()?.nombre }} {{ auth.currentUser()?.apellido }}</span>
-      <small>{{ auth.currentUser()?.rol }}</small>
+      <div>
+        <h1 class="h5 mb-0">Panel de gestión</h1>
+        <small class="text-secondary">Inventario y ventas</small>
+      </div>
+      <span class="topbar-user">
+        <i class="bi bi-person-circle"></i>
+        {{ auth.currentUser()?.nombre }} {{ auth.currentUser()?.apellido }}
+      </span>
     </header>
+
     <router-outlet />
+
+    <footer>
+      <div class="container">© 2026 Incheky · Todos los derechos reservados</div>
+    </footer>
   </section>
 </div>

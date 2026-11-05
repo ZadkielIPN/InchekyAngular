@@ -1,10 +1,49 @@
 <main class="auth-page">
   <form class="card auth-card" (ngSubmit)="submit()">
-    <h1>Incheky</h1>
-    <p>Gestión de inventario y ventas</p>
-    <label>Correo<input type="email" name="email" [(ngModel)]="email" required /></label>
-    <label>Contraseña<input type="password" name="contrasena" [(ngModel)]="contrasena" minlength="8" required /></label>
-    @if (error()) { <div class="error">{{ error() }}</div> }
-    <button class="primary" type="submit" [disabled]="auth.loading()">Iniciar sesión</button>
+    <div class="text-center mb-4">
+      <div class="auth-logo">
+        <i class="bi bi-shop"></i>
+      </div>
+      <h1 class="h3 mb-2">Bienvenido a Incheky</h1>
+      <p class="muted mb-0">Gestión de inventario y ventas</p>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="email">Correo electrónico</label>
+      <input
+        id="email"
+        class="form-control"
+        type="email"
+        name="email"
+        [(ngModel)]="email"
+        required
+      />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" for="contrasena">Contraseña</label>
+      <input
+        id="contrasena"
+        class="form-control"
+        type="password"
+        name="contrasena"
+        [(ngModel)]="contrasena"
+        minlength="8"
+        required
+      />
+    </div>
+
+    @if (error()) {
+      <div class="notice error mb-3" role="alert">
+        {{ error() }}
+      </div>
+    }
+
+    <button class="btn btn-primary w-100" type="submit" [disabled]="auth.loading()">
+      @if (auth.loading()) {
+        <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+      }
+      Iniciar sesión
+    </button>
   </form>
 </main>
