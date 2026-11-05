@@ -23,6 +23,27 @@ export class GenericEntityListComponent {
   readonly error = signal('');
   currentPage = 0;
 
+  displayColumn(column: string) {
+    const labels: Record<string, string> = {
+      cajeroNombre: 'Cajero',
+      clienteNombre: 'Cliente',
+      proveedorNombre: 'Proveedor',
+    };
+    if (labels[column]) return labels[column];
+
+    return column
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/^./, (value) => value.toUpperCase());
+  }
+
+  displayValue(item: Record<string, unknown>, column: string) {
+    const value = item[column];
+    if (value !== undefined && value !== null && value !== '') return value;
+
+    const idColumn = column.replace(/Nombre$/, 'Id');
+    return item[idColumn] ?? '';
+  }
+
   constructor() {
     this.load();
   }

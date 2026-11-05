@@ -119,7 +119,9 @@ export interface Venta {
   id: number;
   fecha: string;
   cajeroId: number;
+  cajeroNombre?: string;
   clienteId?: number;
+  clienteNombre?: string;
   detalles: DetalleVenta[];
   total: number;
   descuentoPorPuntos?: number;
@@ -140,6 +142,7 @@ export interface Abastecimiento {
   id: number;
   fecha: string;
   proveedorId: number;
+  proveedorNombre?: string;
   detalles: DetalleAbastecimiento[];
   total: number;
 }

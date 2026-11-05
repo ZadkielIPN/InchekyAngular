@@ -24,7 +24,7 @@
         <thead>
           <tr>
             @for (column of columns; track column) {
-              <th scope="col">{{ column }}</th>
+              <th scope="col">{{ displayColumn(column) }}</th>
             }
             <th scope="col">Acciones</th>
           </tr>
@@ -33,7 +33,7 @@
           @for (item of page()?.content ?? []; track item['id']) {
             <tr>
               @for (column of columns; track column) {
-                <td>{{ item[column] }}</td>
+                <td>{{ displayValue(item, column) }}</td>
               }
               <td>
                 @if (canEdit) {

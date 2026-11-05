@@ -140,7 +140,7 @@ export const routes: Routes = [
         data: {
           title: 'Ventas',
           endpoint: 'ventas',
-          columns: ['fecha', 'cajeroId', 'clienteId', 'total', 'metodoPago'],
+          columns: ['fecha', 'cajeroNombre', 'clienteNombre', 'total', 'metodoPago'],
           canEdit: false,
         },
       },
@@ -152,7 +152,7 @@ export const routes: Routes = [
         data: {
           title: 'Abastecimientos',
           endpoint: 'abastecimientos',
-          columns: ['fecha', 'proveedorId', 'total'],
+          columns: ['fecha', 'proveedorNombre', 'total'],
           canEdit: false,
         },
       },
