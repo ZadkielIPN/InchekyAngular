@@ -10,6 +10,13 @@
   </div>
 
   <div class="dashboard-grid">
+    @if (auth.hasRole('CAJERO', 'ADMINISTRADOR')) {
+      <a class="card dashboard-card dashboard-card-featured" routerLink="/ventas/nuevo">
+        <i class="bi bi-cart-check-fill"></i>
+        <strong>Crear ticket</strong>
+        <span class="muted">Busca productos y registra una venta</span>
+      </a>
+    }
     <a class="card dashboard-card" routerLink="/productos">
       <i class="bi bi-box-seam"></i>
       <strong>Productos</strong>
@@ -30,6 +37,23 @@
       <strong>Abastecimientos</strong>
       <span class="muted">Entradas de inventario</span>
     </a>
+    @if (auth.hasRole('ADMINISTRADOR')) {
+      <a class="card dashboard-card" routerLink="/administradores">
+        <i class="bi bi-person-vcard-fill"></i>
+        <strong>Administradores</strong>
+        <span class="muted">Gestiona cuentas administrativas</span>
+      </a>
+      <a class="card dashboard-card" routerLink="/cajeros">
+        <i class="bi bi-person-badge-fill"></i>
+        <strong>Cajeros</strong>
+        <span class="muted">Administra el personal de cajas</span>
+      </a>
+      <a class="card dashboard-card" routerLink="/promociones">
+        <i class="bi bi-percent"></i>
+        <strong>Promociones</strong>
+        <span class="muted">Configura descuentos vigentes</span>
+      </a>
+    }
   </div>
 </main>
 }
