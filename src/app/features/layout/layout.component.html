@@ -8,9 +8,19 @@
     </a>
 
     <nav aria-label="Navegación principal">
+      @if (canAccess('CLIENTE')) {
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          <i class="bi bi-house-heart"></i><span>Inicio</span>
+        </a>
+        <a routerLink="/perfil" routerLinkActive="active">
+          <i class="bi bi-person-circle"></i><span>Mi perfil</span>
+        </a>
+        <a routerLink="/mis-compras" routerLinkActive="active">
+          <i class="bi bi-receipt"></i><span>Mis compras</span>
+        </a>
+      } @else {
       <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-        <i class="bi bi-grid-1x2-fill"></i>
-        <span>Dashboard</span>
+        <i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span>
       </a>
       <a routerLink="/productos" routerLinkActive="active">
         <i class="bi bi-box-seam"></i>
@@ -52,6 +62,7 @@
           <span>Abastecimientos</span>
         </a>
       }
+      }
     </nav>
 
     <div class="sidebar-footer">
@@ -74,8 +85,13 @@
   <section class="content">
     <header class="topbar">
       <div>
-        <h1 class="h5 mb-0">Panel de gestión</h1>
-        <small class="text-secondary">Inventario y ventas</small>
+        @if (canAccess('CLIENTE')) {
+          <h1 class="h5 mb-0">Mi espacio Incheky</h1>
+          <small class="text-secondary">Productos, perfil e historial</small>
+        } @else {
+          <h1 class="h5 mb-0">Panel de gestión</h1>
+          <small class="text-secondary">Inventario y ventas</small>
+        }
       </div>
       <span class="topbar-user">
         <i class="bi bi-person-circle"></i>

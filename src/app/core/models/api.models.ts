@@ -31,6 +31,23 @@ export interface UsuarioSession {
   rol: Rol;
 }
 
+export interface UsuarioProfile {
+  id: number;
+  nombre: string;
+  apellido: string;
+  email: string;
+  rol: Rol;
+  puntos?: number;
+  nivelLealtad?: NivelLealtad;
+}
+
+export interface UsuarioProfileRequest {
+  nombre: string;
+  apellido: string;
+  email: string;
+  contrasena?: string;
+}
+
 export interface Usuario {
   id: number;
   nombre: string;
