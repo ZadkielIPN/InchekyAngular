@@ -5,6 +5,16 @@
       <i class="bi bi-plus-lg"></i> Nuevo proveedor
     </a>
   </div>
+  <form class="search-bar mb-3" (ngSubmit)="search()">
+    <div class="search-input">
+      <i class="bi bi-search"></i>
+      <input class="form-control" name="query" [(ngModel)]="query"
+             placeholder="Buscar por nombre, correo o teléfono..." />
+    </div>
+    <button class="btn btn-outline-primary" type="submit">
+      <i class="bi bi-search"></i> Buscar
+    </button>
+  </form>
   @if (loading()) {
     <app-loading />
   } @else {

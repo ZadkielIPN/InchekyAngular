@@ -81,6 +81,11 @@
             <div class="ticket-item-info">
               <strong>{{ item.producto.nombre }}</strong>
               <small>{{ item.producto.precio | currency:'MXN':'symbol':'1.2-2' }} c/u</small>
+              @if (activePromotion(item.producto); as promotion) {
+                <small class="text-success">
+                  <i class="bi bi-tag"></i> {{ promotion.nombre }} (-{{ promotion.porcentajeDescuento }}%)
+                </small>
+              }
             </div>
             <input class="form-control ticket-quantity" type="number" min="1" [max]="item.producto.stock"
                    [value]="item.cantidad" (change)="updateQuantity(item.producto.id, $any($event.target).value)" />
@@ -110,6 +115,7 @@
       @if (error()) { <div class="notice error mt-3">{{ error() }}</div> }
       <div class="ticket-discounts">
         <div><span>Subtotal</span><strong>{{ subtotal() | currency:'MXN':'symbol':'1.2-2' }}</strong></div>
+        <div><span>Promociones</span><strong>-{{ promotionDiscount() | currency:'MXN':'symbol':'1.2-2' }}</strong></div>
         <div><span>Nivel {{ selectedClient()?.nivelLealtad ?? 'BRONCE' }}</span><strong>-{{ loyaltyDiscount() | currency:'MXN':'symbol':'1.2-2' }}</strong></div>
         <div><span>Puntos ({{ puntosUtilizados() }})</span><strong>-{{ pointsDiscount() | currency:'MXN':'symbol':'1.2-2' }}</strong></div>
       </div>

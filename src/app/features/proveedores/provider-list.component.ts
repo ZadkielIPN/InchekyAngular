@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { ProviderService } from './provider.service';
 import { Proveedor, PageResponse } from '../../core/models/api.models';
 import { LoadingComponent } from '../../shared/components/loading/loading.component';
@@ -7,7 +8,7 @@ import { LoadingComponent } from '../../shared/components/loading/loading.compon
 @Component({
   selector: 'app-provider-list',
   standalone: true,
-  imports: [RouterLink, LoadingComponent],
+  imports: [RouterLink, LoadingComponent, FormsModule],
   templateUrl: './provider-list.component.html',
 })
 export class ProviderListComponent {
@@ -15,13 +16,14 @@ export class ProviderListComponent {
   readonly data = signal<PageResponse<Proveedor> | null>(null);
   readonly loading = signal(true);
   page = 0;
+  query = '';
   constructor() {
     this.load();
   }
   load() {
     this.loading.set(true);
     this.service
-      .list(this.page)
+      .list(this.page, this.query)
       .subscribe({
         next: (value) => this.data.set(value),
         complete: () => this.loading.set(false),
@@ -29,6 +31,10 @@ export class ProviderListComponent {
   }
   remove(id: number) {
     if (confirm('¿Eliminar proveedor?')) this.service.delete(id).subscribe(() => this.load());
+  }
+  search() {
+    this.page = 0;
+    this.load();
   }
   next() {
     if (!this.data()?.last) {
