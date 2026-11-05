@@ -3,11 +3,15 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../../core/services/api.service';
 import { Producto } from '../../../core/models/api.models';
+import {
+  EntityDropdownComponent,
+  EntityDropdownOption,
+} from '../entity-dropdown/entity-dropdown.component';
 
 @Component({
   selector: 'app-generic-entity-form',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, EntityDropdownComponent],
   templateUrl: './generic-entity-form.component.html',
 })
 export class GenericEntityFormComponent {
@@ -20,6 +24,7 @@ export class GenericEntityFormComponent {
   readonly id = Number(this.route.snapshot.paramMap.get('id'));
   readonly error = signal('');
   readonly products = signal<Producto[]>([]);
+  readonly productOptions = signal<EntityDropdownOption[]>([]);
   readonly form = this.fb.nonNullable.group({
     nombre: ['', Validators.required],
     apellido: [''],
@@ -40,7 +45,15 @@ export class GenericEntityFormComponent {
   constructor() {
     if (this.endpoint === 'promociones') {
       this.api.list<Producto>('productos', 0, 100).subscribe({
-        next: (page) => this.products.set(page.content),
+        next: (page) => {
+          this.products.set(page.content);
+          this.productOptions.set(page.content.map((product) => ({
+            id: product.id,
+            label: product.nombre,
+            secondary: `${product.codigoBarras} · Stock ${product.stock}`,
+            icon: 'bi-box-seam',
+          })));
+        },
         error: () => this.error.set('No se pudieron cargar los productos para la promoción.'),
       });
     }

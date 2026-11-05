@@ -84,14 +84,17 @@
           <input id="fechaFin" class="form-control" type="date" formControlName="fechaFin" />
         </div>
         <div class="col-12">
-          <label class="form-label" for="productoIds">Productos incluidos</label>
-          <select id="productoIds" class="form-select" multiple formControlName="productoIds" size="6">
-            @for (product of products(); track product.id) {
-              <option [ngValue]="product.id">{{ product.id }} - {{ product.nombre }}</option>
-            }
-          </select>
+          <label class="form-label">Productos incluidos</label>
+          <app-entity-dropdown
+            formControlName="productoIds"
+            [options]="productOptions()"
+            [multiple]="true"
+            placeholder="Selecciona productos"
+            searchPlaceholder="Filtrar productos por nombre o código..."
+            icon="bi-box-seam"
+          />
           <small class="form-text text-muted">
-            Mantén presionada la tecla Ctrl (o Cmd en macOS) para seleccionar varios productos.
+            Busca por nombre o código y selecciona todos los productos que aplican.
           </small>
         </div>
         <div class="col-12 form-check ms-2">

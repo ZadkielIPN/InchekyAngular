@@ -6,6 +6,10 @@ import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { Cajero, Cliente, Producto } from '../../core/models/api.models';
 import { OperationService } from './operation.service';
+import {
+  EntityDropdownComponent,
+  EntityDropdownOption,
+} from '../../shared/components/entity-dropdown/entity-dropdown.component';
 
 interface TicketItem {
   producto: Producto;
@@ -15,7 +19,7 @@ interface TicketItem {
 @Component({
   selector: 'app-sale-form',
   standalone: true,
-  imports: [FormsModule, RouterLink, CurrencyPipe],
+  imports: [FormsModule, RouterLink, CurrencyPipe, EntityDropdownComponent],
   templateUrl: './sale-form.component.html',
 })
 export class SaleFormComponent {
@@ -59,6 +63,22 @@ export class SaleFormComponent {
   );
   readonly currentUser = this.auth.currentUser;
   private readonly search$ = new Subject<string>();
+  readonly clientOptions = computed<EntityDropdownOption[]>(() =>
+    this.clients().map((client) => ({
+      id: client.id,
+      label: `${client.nombre} ${client.apellido}`.trim(),
+      secondary: client.email,
+      icon: 'bi-person',
+    })),
+  );
+  readonly cashierOptions = computed<EntityDropdownOption[]>(() =>
+    this.cashiers().map((cashier) => ({
+      id: cashier.id,
+      label: `${cashier.nombre} ${cashier.apellido}`.trim(),
+      secondary: `Empleado ${cashier.numeroEmpleado}`,
+      icon: 'bi-person-badge',
+    })),
+  );
 
   constructor() {
     this.loadProducts();
