@@ -147,6 +147,23 @@ a {
   margin: 0;
 }
 
+.page-heading > a:not(.btn) {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .55rem .9rem;
+  border: 1px solid var(--incheky-accent);
+  border-radius: .5rem;
+  background: var(--incheky-accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+.page-heading > a:not(.btn):hover {
+  background: #1e40af;
+  color: #fff;
+}
+
 .panel,
 .card {
   border: 1px solid var(--incheky-line);
@@ -194,7 +211,55 @@ a {
 }
 
 .table-wrap table {
+  width: 100%;
   min-width: 720px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  color: var(--incheky-ink);
+}
+
+.table-wrap > table thead th {
+  background: #f8fafc;
+  border-bottom: 1px solid var(--incheky-line);
+}
+
+.table-wrap > table tbody td {
+  border-bottom: 1px solid #eef2f7;
+}
+
+.table-wrap > table tbody tr:hover {
+  background: #f8fbff;
+}
+
+.table-wrap > table tbody td:last-child {
+  white-space: nowrap;
+}
+
+.table-wrap > table a:not(.btn) {
+  display: inline-flex;
+  align-items: center;
+  padding: .35rem .6rem;
+  border: 1px solid #93c5fd;
+  border-radius: .4rem;
+  color: #1d4ed8;
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+.table-wrap > table button:not(.btn) {
+  padding: .35rem .6rem;
+  border: 1px solid #fca5a5;
+  border-radius: .4rem;
+  background: #fff;
+  color: #b91c1c;
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.table-wrap > table button:not(.btn):hover {
+  background: #fef2f2;
 }
 
 .table-wrap th {
