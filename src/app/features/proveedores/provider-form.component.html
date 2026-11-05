@@ -1,1 +1,31 @@
-<section class="page"><h1>{{ id ? 'Editar' : 'Nuevo' }} proveedor</h1><form class="card form-grid" [formGroup]="form" (ngSubmit)="save()"><label>Nombre<input formControlName="nombre"></label><label>Teléfono<input formControlName="telefono"></label><label>Email<input type="email" formControlName="email"></label><label>Dirección<textarea formControlName="direccion"></textarea></label><label class="checkbox"><input type="checkbox" formControlName="activo"> Activo</label>@if(error()){<div class="error">{{error()}}</div>}<div><button class="primary" type="submit">Guardar</button> <a routerLink="/proveedores">Cancelar</a></div></form></section>
+<section class="page">
+  <h1>{{ id ? 'Editar' : 'Nuevo' }} proveedor</h1>
+  <form class="card form-grid" [formGroup]="form" (ngSubmit)="save()">
+    <label>
+      Nombre
+      <input formControlName="nombre">
+    </label>
+    <label>
+      Teléfono
+      <input formControlName="telefono">
+    </label>
+    <label>
+      Email
+      <input type="email" formControlName="email">
+    </label>
+    <label>
+      Dirección
+      <textarea formControlName="direccion">
+      </textarea>
+    </label>
+    <label class="checkbox">
+      <input type="checkbox" formControlName="activo">
+      Activo
+    </label>
+    @if(error()) {<div class="error">{{error()}}</div>}
+    <div>
+      <button class="primary" type="submit">Guardar</button>
+      <a routerLink="/proveedores">Cancelar</a>
+    </div>
+  </form>
+</section>

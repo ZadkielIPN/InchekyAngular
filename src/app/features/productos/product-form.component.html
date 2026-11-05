@@ -1,1 +1,52 @@
-<section class="page"><h1>{{id?'Editar':'Nuevo'}} producto</h1><form class="card form-grid" [formGroup]="form" (ngSubmit)="save()"><label>Nombre<input formControlName="nombre"></label><label>Descripción<textarea formControlName="descripcion"></textarea></label><label>Precio<input type="number" formControlName="precio"></label><label>Stock<input type="number" formControlName="stock"></label><label>Peso<input type="number" formControlName="peso"></label><label>Código de barras<input formControlName="codigoBarras"></label><label>Unidad<select formControlName="unidadMedida">@for(unit of units;track unit){<option [value]="unit">{{unit}}</option>}</select></label><label>Caducidad<input type="date" formControlName="fechaCaducidad"></label><label>Imagen<input type="file" accept="image/*" (change)="selectFile($event)"></label><label class="checkbox"><input type="checkbox" formControlName="activo"> Activo</label>@if(error()){<div class="error">{{error()}}</div>}<div><button class="primary" type="submit">Guardar</button> <a routerLink="/productos">Cancelar</a></div></form></section>
+<section class="page">
+  <h1>{{id?'Editar':'Nuevo'}} producto</h1>
+  <form class="card form-grid" [formGroup]="form" (ngSubmit)="save()">
+    <label>Nombre
+      <input formControlName="nombre">
+    </label>
+    <label>
+      Descripción
+      <textarea formControlName="descripcion">
+      </textarea>
+    </label>
+    <label>
+      Precio
+      <input type="number" formControlName="precio">
+    </label>
+    <label>
+      Stock
+      <input type="number" formControlName="stock">
+    </label>
+    <label>
+      Peso
+      <input type="number" formControlName="peso">
+    </label>
+    <label>
+      Código de barras
+      <input formControlName="codigoBarras">
+    </label>
+    <label>
+      Unidad
+      <select formControlName="unidadMedida">
+        @for(unit of units;track unit){<option [value]="unit">{{unit}}</option>}
+      </select>
+    </label>
+    <label>
+      Caducidad
+      <input type="date" formControlName="fechaCaducidad">
+    </label>
+    <label>
+      Imagen
+      <input type="file" accept="image/*" (change)="selectFile($event)">
+    </label>
+    <label class="checkbox">
+      <input type="checkbox" formControlName="activo">
+      Activo
+    </label>
+    @if(error()){<div class="error">{{error()}}</div>}
+    <div>
+      <button class="primary" type="submit">Guardar</button>
+      <a routerLink="/productos">Cancelar</a>
+    </div>
+  </form>
+</section>
