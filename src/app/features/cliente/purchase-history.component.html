@@ -7,14 +7,30 @@
     <div class="card empty-state"><i class="bi bi-receipt"></i><p>Aún no tienes compras registradas.</p></div>
   } @else {
     <div class="card table-card">
-      <div class="table-responsive"><table class="table align-middle mb-0">
-        <thead><tr><th>Fecha</th><th>Método de pago</th><th>Total</th><th>Puntos</th></tr></thead>
-        <tbody>
-          @for (venta of ventas(); track venta.id) {
-            <tr><td>{{ venta.fecha | date:'dd/MM/yyyy HH:mm' }}</td><td>{{ venta.metodoPago }}</td><td>{{ venta.total | currency:'MXN':'symbol':'1.2-2' }}</td><td>{{ venta.puntosGanados ?? 0 }}</td></tr>
-          }
-        </tbody>
-      </table></div>
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Fecha</th>
+              <th>Método de pago</th>
+              <th>Total</th>
+              <th>Puntos</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (venta of ventas(); track venta.id) {
+              <tr>
+                <td>{{ venta.id }}</td>
+                <td>{{ venta.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td>{{ venta.metodoPago }}</td>
+                <td>{{ venta.total | currency:'MXN':'symbol':'1.2-2' }}</td>
+                <td>{{ venta.puntosGanados ?? 0 }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
     </div>
   }
 </main>
