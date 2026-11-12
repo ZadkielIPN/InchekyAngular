@@ -14,6 +14,7 @@ import { SaleFormComponent } from './features/operaciones/sale-form.component';
 import { SupplyFormComponent } from './features/operaciones/supply-form.component';
 import { ProfileComponent } from './features/cliente/profile.component';
 import { PurchaseHistoryComponent } from './features/cliente/purchase-history.component';
+import { GenericEntityDetailComponent } from './shared/components/generic-entity-detail/generic-entity-detail.component';
 import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
@@ -33,6 +34,15 @@ export const routes: Routes = [
       { path: 'proveedores', component: ProviderListComponent, canActivate: [roleGuard(['ADMINISTRADOR', 'CAJERO'])] },
       { path: 'proveedores/nuevo', component: ProviderFormComponent, canActivate: [roleGuard(['ADMINISTRADOR'])] },
       { path: 'proveedores/:id/editar', component: ProviderFormComponent, canActivate: [roleGuard(['ADMINISTRADOR'])] },
+      { path: 'productos/:id/ver', component: GenericEntityDetailComponent, canActivate: [roleGuard(['ADMINISTRADOR', 'CAJERO'])], data: { title: 'producto', endpoint: 'productos' } },
+      { path: 'proveedores/:id/ver', component: GenericEntityDetailComponent, canActivate: [roleGuard(['ADMINISTRADOR', 'CAJERO'])], data: { title: 'proveedor', endpoint: 'proveedores' } },
+      { path: 'clientes/:id/ver', component: GenericEntityDetailComponent, canActivate: [roleGuard(['ADMINISTRADOR', 'CAJERO'])], data: { title: 'cliente', endpoint: 'clientes' } },
+      { path: 'promociones/:id/ver', component: GenericEntityDetailComponent, canActivate: [roleGuard(['ADMINISTRADOR', 'CAJERO'])], data: { title: 'promoción', endpoint: 'promociones' } },
+      { path: 'ventas/:id/ver', component: GenericEntityDetailComponent, canActivate: [roleGuard(['ADMINISTRADOR', 'CAJERO'])], data: { title: 'venta', endpoint: 'ventas' } },
+      { path: 'abastecimientos/:id/ver', component: GenericEntityDetailComponent, canActivate: [roleGuard(['ADMINISTRADOR', 'CAJERO'])], data: { title: 'abastecimiento', endpoint: 'abastecimientos' } },
+      { path: 'usuarios/:id/ver', component: GenericEntityDetailComponent, canActivate: [roleGuard(['ADMINISTRADOR'])], data: { title: 'usuario', endpoint: 'usuarios' } },
+      { path: 'cajeros/:id/ver', component: GenericEntityDetailComponent, canActivate: [roleGuard(['ADMINISTRADOR'])], data: { title: 'cajero', endpoint: 'cajeros' } },
+      { path: 'administradores/:id/ver', component: GenericEntityDetailComponent, canActivate: [roleGuard(['ADMINISTRADOR'])], data: { title: 'administrador', endpoint: 'administradores' } },
       {
         path: 'clientes',
         component: GenericEntityListComponent,

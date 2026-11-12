@@ -49,18 +49,20 @@
             <input id="cajaAsignada" class="form-control" type="number" min="1" formControlName="cajaAsignada" />
           </div>
         }
-        <div class="col-md-3">
-          <label class="form-label" for="puntos">Puntos</label>
-          <input id="puntos" class="form-control" type="number" formControlName="puntos" />
-        </div>
-        <div class="col-md-3">
-          <label class="form-label" for="nivelLealtad">Nivel</label>
-          <select id="nivelLealtad" class="form-select" formControlName="nivelLealtad">
-            <option value="BRONCE">Bronce</option>
-            <option value="PLATA">Plata</option>
-            <option value="ORO">Oro</option>
-          </select>
-        </div>
+        @if (endpoint === 'clientes') {
+          <div class="col-md-3">
+            <label class="form-label" for="puntos">Puntos</label>
+            <input id="puntos" class="form-control" type="number" formControlName="puntos" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label" for="nivelLealtad">Nivel</label>
+            <select id="nivelLealtad" class="form-select" formControlName="nivelLealtad">
+              <option value="BRONCE">Bronce</option>
+              <option value="PLATA">Plata</option>
+              <option value="ORO">Oro</option>
+            </select>
+          </div>
+        }
       }
 
       @if (endpoint === 'promociones') {

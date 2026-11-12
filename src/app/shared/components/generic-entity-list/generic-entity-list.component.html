@@ -50,6 +50,14 @@
                 <td>{{ displayValue(item, column) }}</td>
               }
               <td>
+                <a
+                  class="btn btn-sm btn-outline-secondary me-1"
+                  [routerLink]="['/', endpoint, item['id'], 'ver']"
+                  title="Ver detalles"
+                  aria-label="Ver detalles"
+                >
+                  <i class="bi bi-eye"></i>
+                </a>
                 @if (canEdit) {
                   <a
                     class="btn btn-sm btn-outline-primary me-1"

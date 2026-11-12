@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { ProductService } from './product.service';
 import { PageResponse, Producto } from '../../core/models/api.models';
 import { LoadingComponent } from '../../shared/components/loading/loading.component';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-product-list',
@@ -16,6 +17,7 @@ export class ProductListComponent {
   private readonly service = inject(ProductService);
   readonly data = signal<PageResponse<Producto> | null>(null);
   readonly loading = signal(true);
+  readonly isAdmin = inject(AuthService).hasRole('ADMINISTRADOR');
   query = '';
   page = 0;
   constructor() {

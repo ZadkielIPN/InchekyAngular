@@ -19,12 +19,11 @@ export class GenericEntityListComponent {
   readonly title = this.route.snapshot.data['title'] as string;
   readonly endpoint = this.route.snapshot.data['endpoint'] as string;
   readonly columns = this.route.snapshot.data['columns'] as string[];
+  readonly isAdmin = this.auth.hasRole('ADMINISTRADOR');
   readonly canCreate = this.route.snapshot.data['canCreate'] !== false
-    && (this.endpoint !== 'promociones' || this.auth.hasRole('ADMINISTRADOR'));
-  readonly canEdit = this.route.snapshot.data['canEdit'] !== false
-    && (this.endpoint !== 'promociones' || this.auth.hasRole('ADMINISTRADOR'));
-  readonly canDelete = this.route.snapshot.data['canDelete'] !== false
-    && (this.endpoint !== 'promociones' || this.auth.hasRole('ADMINISTRADOR'));
+    && (this.isAdmin || this.endpoint === 'ventas');
+  readonly canEdit = this.route.snapshot.data['canEdit'] !== false && this.isAdmin;
+  readonly canDelete = this.route.snapshot.data['canDelete'] !== false && this.isAdmin;
   readonly page = signal<PageResponse<Record<string, unknown>> | null>(null);
   readonly loading = signal(true);
   readonly error = signal('');

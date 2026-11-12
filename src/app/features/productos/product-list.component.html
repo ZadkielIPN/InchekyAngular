@@ -2,7 +2,11 @@
   <div class="page-heading">
     <h1>Productos</h1>
     <a class="btn btn-primary" routerLink="/productos/nuevo">
-      <i class="bi bi-plus-lg"></i> Nuevo producto
+      @if (isAdmin) {
+        <a class="btn btn-primary" routerLink="/productos/nuevo">
+          <i class="bi bi-plus-lg"></i> Nuevo producto
+        </a>
+      }
     </a>
   </div>
   <form class="search-bar" (ngSubmit)="search()">
@@ -38,12 +42,18 @@
               <td>{{ item.unidadMedida }}</td>
               <td>{{ item.activo ? 'Sí' : 'No' }}</td>
               <td>
-                <a class="btn btn-sm btn-outline-primary me-1" [routerLink]="['/productos', item.id, 'editar']">
-                  <i class="bi bi-pencil"></i>
+                <a class="btn btn-sm btn-outline-secondary me-1" [routerLink]="['/productos', item.id, 'ver']"
+                   title="Ver detalles" aria-label="Ver detalles">
+                  <i class="bi bi-eye"></i>
                 </a>
-                <button class="btn btn-sm btn-outline-danger" type="button" (click)="remove(item.id)">
-                  <i class="bi bi-trash"></i>
-                </button>
+                @if (isAdmin) {
+                  <a class="btn btn-sm btn-outline-primary me-1" [routerLink]="['/productos', item.id, 'editar']">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <button class="btn btn-sm btn-outline-danger" type="button" (click)="remove(item.id)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                }
               </td>
             </tr>
           } @empty {

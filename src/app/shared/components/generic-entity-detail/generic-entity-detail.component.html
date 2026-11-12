@@ -1,0 +1,149 @@
+<main class="page">
+  <div class="page-heading">
+    <div>
+      <span class="eyebrow text-primary">{{ config.label.toUpperCase() }}</span>
+      <h1>{{ heading() }}</h1>
+      <p class="muted mb-0">Detalle del registro #{{ id }}.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-secondary" [routerLink]="['/', endpoint]">
+        <i class="bi bi-arrow-left"></i> Volver
+      </a>
+      @if (endpoint === 'ventas') {
+        <button class="btn btn-outline-primary" type="button" (click)="downloadTicket()" [disabled]="downloading()">
+          @if (downloading()) { <span class="spinner-border spinner-border-sm me-1"></span> }
+          <i class="bi bi-file-earmark-pdf"></i> Descargar ticket
+        </button>
+      }
+      @if (canEdit) {
+        <a class="btn btn-primary" [routerLink]="['/', endpoint, id, 'editar']">
+          <i class="bi bi-pencil"></i> Editar
+        </a>
+      }
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-loading />
+  } @else {
+    @if (error()) { <div class="notice error mb-3" role="alert">{{ error() }}</div> }
+    @if (ticketError()) { <div class="notice error mb-3" role="alert">{{ ticketError() }}</div> }
+
+    @if (record(); as r) {
+      @if (rows().length) {
+        <section class="panel mb-3">
+          <h2 class="h5 mb-3">Detalles</h2>
+          <dl class="row mb-0">
+            @for (row of rows(); track row.label) {
+              <dt class="col-sm-4">{{ row.label }}</dt>
+              <dd class="col-sm-8">
+                @switch (row.type) {
+                  @case ('money') { {{ row.value | currency:'MXN':'symbol':'1.2-2' }} }
+                  @case ('date') { {{ row.value | date:'dd/MM/yyyy' }} }
+                  @case ('datetime') { {{ row.value | date:'dd/MM/yyyy HH:mm' }} }
+                  @case ('number') { {{ row.value | number:'1.0-3' }} }
+                  @case ('bool') { {{ row.value ? 'Sí' : 'No' }} }
+                  @default { {{ row.value }} }
+                }
+              </dd>
+            }
+          </dl>
+        </section>
+      }
+
+      @switch (endpoint) {
+        @case ('productos') {
+          @if (imageUrl(); as src) {
+            <section class="panel mb-3">
+              <h2 class="h5 mb-3">Imagen</h2>
+              <img [src]="src" [alt]="r['nombre']" class="img-fluid rounded" style="max-height: 260px" />
+            </section>
+          }
+          <section class="panel mb-3">
+            <h2 class="h5 mb-3">Promociones asociadas</h2>
+            @for (id of r['promocionIds'] ?? []; track id) {
+              <span class="badge text-bg-light border me-1">{{ name(id) }}</span>
+            } @empty {
+              <span class="muted">Este producto no tiene promociones.</span>
+            }
+          </section>
+        }
+
+        @case ('promociones') {
+          <section class="panel mb-3">
+            <h2 class="h5 mb-3">Productos incluidos</h2>
+            @for (id of r['productoIds'] ?? []; track id) {
+              <span class="badge text-bg-light border me-1">{{ name(id) }}</span>
+            } @empty {
+              <span class="muted">Esta promoción no tiene productos.</span>
+            }
+          </section>
+        }
+
+        @case ('ventas') {
+          <section class="panel mb-3">
+            <h2 class="h5 mb-3">Productos vendidos</h2>
+            <div class="table-responsive">
+              <table class="table align-middle mb-0">
+                <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Cantidad</th>
+                  <th>Precio unitario</th>
+                  <th>Promoción</th>
+                  <th>Descuento</th>
+                  <th class="text-end">Total</th>
+                </tr>
+                </thead>
+                <tbody>
+                  @for (d of r['detalles'] ?? []; track d['id']) {
+                    <tr>
+                      <td>{{ d['productoNombre'] ?? '#' + d['productoId'] }}</td>
+                      <td>{{ d['cantidad'] }}</td>
+                      <td>{{ d['precioUnitario'] | currency:'MXN':'symbol':'1.2-2' }}</td>
+                      <td>{{ d['descuentoImporte'] > 0 ? '-' + (d['descuentoPorcentaje'] | number:'1.0-2') + '%' : '—' }}</td>
+                      <td>{{ d['descuentoImporte'] | currency:'MXN':'symbol':'1.2-2' }}</td>
+                      <td class="text-end">{{ (d['total'] ?? d['subtotal']) | currency:'MXN':'symbol':'1.2-2' }}</td>
+                    </tr>
+                  } @empty {
+                    <tr><td colspan="6" class="muted">Sin productos.</td></tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </section>
+        }
+
+        @case ('abastecimientos') {
+          <section class="panel mb-3">
+            <h2 class="h5 mb-3">Productos abastecidos</h2>
+            <div class="table-responsive">
+              <table class="table align-middle mb-0">
+                <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Cantidad</th>
+                  <th>Costo unitario</th>
+                  <th class="text-end">Subtotal</th>
+                </tr>
+                </thead>
+                <tbody>
+                  @for (d of r['detalles'] ?? []; track d['id']) {
+                    <tr>
+                      <td>{{ name(d['productoId']) }}</td>
+                      <td>{{ d['cantidad'] }}</td>
+                      <td>{{ d['costoUnitario'] | currency:'MXN':'symbol':'1.2-2' }}</td>
+                      <td class="text-end">{{ d['subtotal'] | currency:'MXN':'symbol':'1.2-2' }}</td>
+                    </tr>
+                  } @empty {
+                    <tr><td colspan="4" class="muted">Sin productos.</td></tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </section>
+        }
+      }
+    }
+  }
+</main>
