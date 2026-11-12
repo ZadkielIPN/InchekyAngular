@@ -4,12 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
-import { Cajero, Cliente, Producto, Promocion } from '../../core/models/api.models';
+import { Cajero, Cliente, Producto, Promocion, Venta } from '../../core/models/api.models';
 import { OperationService } from './operation.service';
 import {
   EntityDropdownComponent,
   EntityDropdownOption,
 } from '../../shared/components/entity-dropdown/entity-dropdown.component';
+import { TicketActionsModalComponent } from '../../shared/components/ticket-actions-modal/ticket-actions-modal.component';
 
 interface TicketItem {
   producto: Producto;
@@ -19,7 +20,7 @@ interface TicketItem {
 @Component({
   selector: 'app-sale-form',
   standalone: true,
-  imports: [FormsModule, RouterLink, CurrencyPipe, EntityDropdownComponent],
+  imports: [FormsModule, RouterLink, CurrencyPipe, EntityDropdownComponent, TicketActionsModalComponent],
   templateUrl: './sale-form.component.html',
 })
 export class SaleFormComponent {
@@ -39,6 +40,10 @@ export class SaleFormComponent {
   readonly selectedCashierId = signal<number | null>(null);
   readonly metodoPago = signal('EFECTIVO');
   readonly puntosUtilizados = signal(0);
+  readonly confirmedSale = signal<Venta | null>(null);
+  readonly confirmedClientEmail = signal('');
+  readonly efectivoRecibido = signal<number | null>(null);
+  readonly isCash = computed(() => this.metodoPago() === 'EFECTIVO');
   readonly selectedClient = computed(() =>
     this.clients().find((client) => client.id === this.selectedClientId()) ?? null,
   );
@@ -72,6 +77,10 @@ export class SaleFormComponent {
     ),
   );
   readonly currentUser = this.auth.currentUser;
+  readonly cashierName = computed(() => {
+    const user = this.currentUser();
+    return user ? `${user.nombre} ${user.apellido}`.trim() : '';
+  });
   private readonly search$ = new Subject<string>();
   readonly clientOptions = computed<EntityDropdownOption[]>(() =>
     this.clients().map((client) => ({
@@ -204,6 +213,18 @@ export class SaleFormComponent {
       return;
     }
 
+    if (this.isCash()) {
+      const diferencia = this.cashDifference();
+      if (diferencia === null) {
+        this.error.set('Captura el efectivo recibido.');
+        return;
+      }
+      if (diferencia < 0) {
+        this.error.set('El efectivo recibido no cubre el total de la venta.');
+        return;
+      }
+    }
+
     this.loading.set(true);
     this.service.createSale({
       fecha: new Date().toISOString().slice(0, 19),
@@ -216,13 +237,18 @@ export class SaleFormComponent {
         cantidad: item.cantidad,
         precioUnitario: item.producto.precio,
       })),
+      efectivoRecibido: this.isCash() ? this.efectivoRecibido() : null,
     }).subscribe({
-      next: () => void this.router.navigate(['/ventas']),
-      error: (error) => {
-        this.loading.set(false);
-        this.error.set(error.error?.message ?? 'No se pudo registrar la venta.');
+      next: (venta) => {
+        this.confirmedClientEmail.set(this.selectedClient()?.email ?? '');
+        this.confirmedSale.set(venta);
       },
     });
+  }
+
+  closeTicketModal() {
+    this.confirmedSale.set(null);
+    void this.router.navigate(['/ventas']);
   }
 
   private loadProducts(query = '') {
@@ -230,5 +256,15 @@ export class SaleFormComponent {
       next: (page) => this.products.set(page.content),
       error: () => this.error.set('No se pudo cargar el catálogo de productos.'),
     });
+  }
+
+  readonly cashDifference = computed(() => {
+    const recibido = this.efectivoRecibido();
+    return recibido === null ? null : Math.round((recibido - this.total()) * 100) / 100;
+  });
+
+  onCashReceivedChange(value: string | number | null) {
+    const amount = value === '' || value === null ? null : Number(value);
+    this.efectivoRecibido.set(amount !== null && Number.isFinite(amount) && amount >= 0 ? amount : null);
   }
 }

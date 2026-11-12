@@ -1,0 +1,65 @@
+<div class="modal-backdrop fade show"></div>
+<div class="modal fade show d-block" tabindex="-1" role="dialog" aria-modal="true"
+     aria-labelledby="ticket-modal-title">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <span class="eyebrow text-success"><i class="bi bi-check-circle-fill"></i> VENTA REGISTRADA</span>
+          <h2 id="ticket-modal-title" class="modal-title h5 mb-0">Ticket #{{ venta().id }}</h2>
+        </div>
+        <button type="button" class="btn-close" aria-label="Cerrar" (click)="close()"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="ticket-total">
+          <span>{{ venta().clienteNombre ?? 'Cliente' }} · {{ venta().metodoPago }}</span>
+          <strong>{{ venta().total | currency:'MXN':'symbol':'1.2-2' }}</strong>
+        </div>
+
+        @if (venta().efectivoRecibido != null) {
+          <div class="ticket-total">
+            <span>Cambio a entregar (recibido {{ venta().efectivoRecibido | currency:'MXN':'symbol':'1.2-2' }})</span>
+            <strong>{{ venta().cambio ?? 0 | currency:'MXN':'symbol':'1.2-2' }}</strong>
+          </div>
+        }
+
+        <div class="d-grid gap-2">
+          <button type="button" class="btn btn-primary" (click)="download()" [disabled]="downloading()">
+            @if (downloading()) { <span class="spinner-border spinner-border-sm me-2"></span> }
+            <i class="bi bi-file-earmark-pdf"></i> Descargar PDF
+          </button>
+
+          <button type="button" class="btn btn-outline-primary" (click)="toggleEmailForm()"
+                  [attr.aria-expanded]="showEmailForm()">
+            <i class="bi bi-envelope"></i> Enviar por correo
+          </button>
+
+          @if (showEmailForm()) {
+            <form class="input-group" (ngSubmit)="sendEmail()">
+              <input class="form-control" type="email" name="emailDestino" placeholder="correo@ejemplo.com"
+                     [ngModel]="email()" (ngModelChange)="email.set($event)" autocomplete="email" />
+              <button class="btn btn-primary" type="submit" [disabled]="sending()">
+                @if (sending()) { <span class="spinner-border spinner-border-sm me-1"></span> }
+                Enviar
+              </button>
+            </form>
+          }
+
+          <button type="button" class="btn btn-outline-secondary" disabled
+                  title="Próximamente: impresión en impresora térmica">
+            <i class="bi bi-printer"></i> Imprimir en térmica
+            <span class="badge text-bg-light ms-1">Próximamente</span>
+          </button>
+        </div>
+
+        @if (error()) { <div class="notice error mt-3" role="alert">{{ error() }}</div> }
+        @if (success()) { <div class="notice mt-3" role="status">{{ success() }}</div> }
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="close()">Terminar</button>
+      </div>
+    </div>
+  </div>
+</div>

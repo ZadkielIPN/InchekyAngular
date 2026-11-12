@@ -25,8 +25,19 @@ export class ApiService {
     return this.http.get<T>(`${this.baseUrl}/${path}`);
   }
 
+  getBlob(path: string) {
+    return this.http.get(`${this.baseUrl}/${path}`, { responseType: 'blob' });
+  }
+
   post<T>(path: string, body: unknown) {
     return this.http.post<T>(`${this.baseUrl}/${path}`, body);
+  }
+
+  postText(path: string, body: unknown, params: Record<string, string> = {}) {
+    return this.http.post(`${this.baseUrl}/${path}`, body, {
+      params: new HttpParams({ fromObject: params }),
+      responseType: 'text',
+    });
   }
 
   put<T>(path: string, body: unknown) {

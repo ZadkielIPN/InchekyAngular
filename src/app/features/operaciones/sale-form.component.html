@@ -64,6 +64,9 @@
             (ngModelChange)="selectedCashierId.set($event)"
             name="cajero"
           />
+        } @else {
+          <label class="form-label" for="cajero">Cajero</label>
+          <input id="cajero" class="form-control" [value]="cashierName()" disabled />
         }
 
         <label class="form-label" for="metodoPago">Método de pago</label>
@@ -123,6 +126,23 @@
         <span>Total estimado</span>
         <strong>{{ total() | currency:'MXN':'symbol':'1.2-2' }}</strong>
       </div>
+      @if (isCash()) {
+        <div class="ticket-points">
+          <label class="form-label" for="efectivoRecibido">Efectivo recibido *</label>
+          <input id="efectivoRecibido" class="form-control" type="number" min="0" step="0.01"
+                 [ngModel]="efectivoRecibido()" (ngModelChange)="onCashReceivedChange($event)"
+                 name="efectivoRecibido" placeholder="0.00" />
+        </div>
+        @if (cashDifference() !== null) {
+          <div class="ticket-discounts">
+            @if (cashDifference()! >= 0) {
+              <div><span>Cambio a entregar</span><strong>{{ cashDifference() | currency:'MXN':'symbol':'1.2-2' }}</strong></div>
+            } @else {
+              <div class="text-danger"><span>Faltan</span><strong class="text-danger">{{ -cashDifference()! | currency:'MXN':'symbol':'1.2-2' }}</strong></div>
+            }
+          </div>
+        }
+      }
       <div class="ticket-points-earned">
         <i class="bi bi-stars"></i>
         Ganarás aproximadamente <strong>{{ earnedPoints() }} puntos</strong> en esta compra.
@@ -133,4 +153,11 @@
       </button>
     </section>
   </div>
+  @if (confirmedSale(); as venta) {
+    <app-ticket-actions-modal
+      [venta]="venta"
+      [defaultEmail]="confirmedClientEmail()"
+      (closed)="closeTicketModal()"
+    />
+  }
 </main>

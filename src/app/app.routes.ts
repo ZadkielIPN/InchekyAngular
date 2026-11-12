@@ -140,7 +140,7 @@ export const routes: Routes = [
         data: {
           title: 'Ventas',
           endpoint: 'ventas',
-          columns: ['id', 'fecha', 'cajeroNombre', 'clienteNombre', 'total', 'descuentoPorPuntos', 'puntosGanados', 'metodoPago'],
+          columns: ['id', 'fecha', 'cajeroNombre', 'clienteNombre', 'total', 'descuento', 'puntosGanados', 'metodoPago'],
           canEdit: false,
           canDelete: false,
         },

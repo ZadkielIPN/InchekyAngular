@@ -119,9 +119,9 @@ export interface DetalleVenta {
   cantidad: number;
   precioUnitario: number;
   promocionId?: number;
-descuentoPorcentaje?: number;
-descuentoImporte?: number;
-subtotal?: number;
+  descuentoPorcentaje?: number;
+  descuentoImporte?: number;
+  subtotal?: number;
 }
 
 export interface Venta {
@@ -133,10 +133,13 @@ export interface Venta {
   clienteNombre?: string;
   detalles: DetalleVenta[];
   total: number;
+  descuento?: number;
   descuentoPorPuntos?: number;
   puntosUtilizados: number;
   puntosGanados?: number;
   metodoPago: MetodoPago;
+  efectivoRecibido?: number | null;
+  cambio?: number | null;
 }
 
 export interface DetalleAbastecimiento {

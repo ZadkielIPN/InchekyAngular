@@ -36,7 +36,7 @@ export class GenericEntityListComponent {
       cajeroNombre: 'Cajero',
       clienteNombre: 'Cliente',
       proveedorNombre: 'Proveedor',
-      descuentoPorPuntos: 'Descuentos',
+      descuento: 'Descuentos',
       puntosGanados: 'Puntos ganados',
     };
     if (labels[column]) return labels[column];
