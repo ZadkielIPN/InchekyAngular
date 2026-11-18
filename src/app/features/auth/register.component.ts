@@ -10,7 +10,7 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './register.component.html',
 })
 export class RegisterComponent {
-  private readonly auth = inject(AuthService);
+  protected readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   readonly error = signal('');
   nombre = '';
