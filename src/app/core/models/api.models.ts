@@ -29,6 +29,11 @@ export type UnidadMedida =
   | 'CENTIMETRO'
   | 'PIEZA';
 
+export interface BajaResponse {
+  eliminado: boolean;
+  mensaje: string;
+}
+
 export interface UsuarioSession {
   id: number;
   nombre: string;
@@ -132,14 +137,17 @@ export interface Venta {
   clienteId?: number;
   clienteNombre?: string;
   detalles: DetalleVenta[];
+  subtotal?: number;
+  descuentoPromociones?: number;
+  descuentoNivel?: number;
+  descuentoPuntos?: number;
   total: number;
   descuento?: number;
-  descuentoPorPuntos?: number;
+  efectivoRecibido?: number | null;
+  cambio?: number | null;
   puntosUtilizados: number;
   puntosGanados?: number;
   metodoPago: MetodoPago;
-  efectivoRecibido?: number | null;
-  cambio?: number | null;
 }
 
 export interface DetalleAbastecimiento {

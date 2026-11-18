@@ -39,17 +39,17 @@
         <div class="catalog-loading"><span class="spinner-border spinner-border-sm text-primary"></span> Actualizando...</div>
       }
       <div class="product-grid">
-      @for (producto of productos(); track producto.id) {
-        <article class="card product-card">
-          <img [src]="imageUrl(producto)" [alt]="producto.nombre" />
-          <div class="product-card-body">
-            <span class="product-category">{{ producto.unidadMedida }}</span>
-            <h3>{{ producto.nombre }}</h3>
-            <p>{{ producto.descripcion }}</p>
-            <strong class="product-price">{{ producto.precio | currency:'MXN':'symbol':'1.2-2' }}</strong>
-          </div>
-        </article>
-      }
+        @for (producto of productos(); track producto.id) {
+          <article class="card product-card">
+            <app-product-image [imagen]="producto.imagen" [alt]="producto.nombre" />
+            <div class="product-card-body">
+              <span class="product-category">{{ producto.unidadMedida }}</span>
+              <h3>{{ producto.nombre }}</h3>
+              <p>{{ producto.descripcion }}</p>
+              <strong class="product-price">{{ producto.precio | currency:'MXN':'symbol':'1.2-2' }}</strong>
+            </div>
+          </article>
+        }
       </div>
     </div>
   }

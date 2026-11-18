@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
 import { Producto } from '../../core/models/api.models';
+import { ProductImageComponent } from '../../shared/components/product-image/product-image.component';
 
 @Component({
   selector: 'app-client-home',
   standalone: true,
-  imports: [FormsModule, CurrencyPipe],
+  imports: [FormsModule, CurrencyPipe, ProductImageComponent],
   templateUrl: './client-home.component.html',
 })
 export class ClientHomeComponent {
@@ -49,11 +50,6 @@ export class ClientHomeComponent {
     this.search$.next(value.trim());
   }
 
-  imageUrl(producto: Producto) {
-    return producto.imagen
-      ? `http://localhost:8080/uploads/productos/${producto.imagen}`
-      : 'assets/images/product-placeholder.svg';
-  }
 
   private load(query: string) {
     this.loading.set(true);

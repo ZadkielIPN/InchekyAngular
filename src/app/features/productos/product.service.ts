@@ -17,8 +17,11 @@ export class ProductService {
     if (file) body.append('file', file);
     return this.api.post<Producto>('productos', body);
   }
-  update(id: number, value: Record<string, unknown>) {
-    return this.api.put<Producto>(`productos/${id}`, value);
+  update(id: number, value: Record<string, unknown>, file?: File) {
+    const body = new FormData();
+    body.append('producto', new Blob([JSON.stringify(value)], { type: 'application/json' }));
+    if (file) body.append('file', file);
+    return this.api.put<Producto>(`productos/${id}`, body);
   }
   delete(id: number) {
     return this.api.delete(`productos/${id}`);
