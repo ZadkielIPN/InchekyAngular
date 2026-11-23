@@ -1,8 +1,10 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { tap } from 'rxjs';
-import { saveBlob } from '../utils/file-download';
+import type { Venta } from '../models/api.models';
 import { ApiService } from './api.service';
+import { saveBlob } from '../utils/file-download';
+import { createTicketPrintDocument } from '../utils/ticket-print-document';
 
 @Injectable({ providedIn: 'root' })
 export class TicketService {
@@ -12,6 +14,17 @@ export class TicketService {
     return this.api
       .getBlob(`ventas/${ventaId}/ticket`)
       .pipe(tap((blob) => saveBlob(blob, `ticket_venta_${ventaId}.pdf`)));
+  }
+
+  printTicket(venta: Venta): boolean {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return false;
+
+    printWindow.opener = null;
+    printWindow.document.open();
+    printWindow.document.write(createTicketPrintDocument(venta));
+    printWindow.document.close();
+    return true;
   }
 
   sendByEmail(ventaId: number, emailDestino: string) {

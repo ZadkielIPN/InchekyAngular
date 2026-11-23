@@ -55,6 +55,18 @@ export class TicketActionsModalComponent implements OnDestroy {
     });
   }
 
+  print() {
+    this.resetMessages();
+    const opened = this.tickets.printTicket(this.venta());
+    if (opened) {
+      this.success.set('Se abrió el diálogo de impresión. Selecciona tu impresora POS de 60 mm.');
+    } else {
+      this.error.set(
+        'El navegador bloqueó la ventana de impresión. Permite las ventanas emergentes e inténtalo de nuevo.',
+      );
+    }
+  }
+
   toggleEmailForm() {
     this.resetMessages();
     if (!this.showEmailForm() && !this.email()) this.email.set(this.defaultEmail());

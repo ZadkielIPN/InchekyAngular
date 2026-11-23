@@ -1,0 +1,178 @@
+<main class="page">
+  <div class="page-heading">
+    <div>
+      <h1>Reporte contable mensual</h1>
+      <p class="muted mb-0">Ventas, costo de mercancía, abastecimientos y gastos.</p>
+    </div>
+    <button class="btn btn-outline-primary" type="button" (click)="downloadCsv()" [disabled]="!report()">
+      <i class="bi bi-download"></i> Descargar CSV
+    </button>
+  </div>
+
+  <section class="panel mb-4">
+    <div class="row g-3 align-items-end">
+      <div class="col-sm-6 col-md-4">
+        <label class="form-label" for="report-month">Mes del reporte</label>
+        <input id="report-month" class="form-control" type="month" [value]="month()"
+               (change)="month.set($any($event.target).value)" />
+      </div>
+      <div class="col-sm-auto">
+        <button class="btn btn-primary" type="button" (click)="loadReport()" [disabled]="loading()">
+          @if (loading()) { <span class="spinner-border spinner-border-sm me-2"></span> }
+          Consultar
+        </button>
+      </div>
+    </div>
+    <p class="small text-muted mt-3 mb-0">
+      Reporte contable interno en MXN. No sustituye una declaración fiscal ni un CFDI.
+      Las compras de inventario se muestran aparte; la utilidad resta el costo de lo vendido para evitar duplicar su costo.
+    </p>
+  </section>
+
+  @if (error()) {
+    <div class="notice error mb-4" role="alert">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="notice" role="status">Cargando reporte...</div>
+  } @else if (report(); as value) {
+    <div class="row g-3 mb-4">
+      <div class="col-sm-6 col-lg-3">
+        <section class="card p-3 h-100">
+          <span class="muted">Ingresos por ventas</span>
+          <strong class="fs-4">{{ value.ingresosVentas | currency:'MXN':'symbol':'1.2-2' }}</strong>
+        </section>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <section class="card p-3 h-100">
+          <span class="muted">Costo de mercancía vendida</span>
+          <strong class="fs-4">{{ value.costoMercanciaVendida | currency:'MXN':'symbol':'1.2-2' }}</strong>
+        </section>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <section class="card p-3 h-100">
+          <span class="muted">Gastos operativos</span>
+          <strong class="fs-4">{{ value.gastosOperativos | currency:'MXN':'symbol':'1.2-2' }}</strong>
+        </section>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <section class="card p-3 h-100 border-primary">
+          <span class="muted">Utilidad neta estimada</span>
+          <strong class="fs-4" [class.text-danger]="value.utilidadNeta < 0">
+            {{ value.utilidadNeta | currency:'MXN':'symbol':'1.2-2' }}
+          </strong>
+        </section>
+      </div>
+    </div>
+
+    <section class="panel mb-4">
+      <h2 class="h5">Resumen</h2>
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <tbody>
+            <tr><th>Ventas antes de descuentos</th><td class="text-end">{{ value.subtotalVentas | currency:'MXN':'symbol':'1.2-2' }}</td></tr>
+            <tr><th>Descuentos aplicados</th><td class="text-end">-{{ value.descuentosVentas | currency:'MXN':'symbol':'1.2-2' }}</td></tr>
+            <tr><th>Ingresos netos por ventas</th><td class="text-end">{{ value.ingresosVentas | currency:'MXN':'symbol':'1.2-2' }}</td></tr>
+            <tr><th>Utilidad bruta (ventas menos costo vendido)</th><td class="text-end">{{ value.utilidadBruta | currency:'MXN':'symbol':'1.2-2' }}</td></tr>
+            <tr><th>Gastos operativos capturados</th><td class="text-end">-{{ value.gastosOperativos | currency:'MXN':'symbol':'1.2-2' }}</td></tr>
+            <tr><th>Compras de inventario del mes (informativo)</th><td class="text-end">{{ value.comprasInventario | currency:'MXN':'symbol':'1.2-2' }}</td></tr>
+            <tr class="table-primary"><th>Utilidad neta estimada</th><th class="text-end">{{ value.utilidadNeta | currency:'MXN':'symbol':'1.2-2' }}</th></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel mb-4">
+      <h2 class="h5">Registrar gasto operativo</h2>
+      <form [formGroup]="expenseForm" (ngSubmit)="saveExpense()">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="form-label" for="expense-date">Fecha y hora</label>
+            <input id="expense-date" class="form-control" type="datetime-local" formControlName="fecha" />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label" for="expense-category">Categoría</label>
+            <input id="expense-category" class="form-control" formControlName="categoria" maxlength="80"
+                   placeholder="Renta, servicios, nómina..." />
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="expense-description">Descripción</label>
+            <input id="expense-description" class="form-control" formControlName="descripcion" maxlength="255" />
+          </div>
+          <div class="col-md-2">
+            <label class="form-label" for="expense-amount">Monto (MXN)</label>
+            <input id="expense-amount" class="form-control" type="number" min="0.01" step="0.01"
+                   formControlName="monto" />
+          </div>
+        </div>
+        @if (expenseForm.invalid && expenseForm.touched) {
+          <div class="notice error mt-3" role="alert">
+            Completa la fecha, categoría, descripción y un monto mayor que cero.
+          </div>
+        }
+        @if (expenseError()) {
+          <div class="notice error mt-3" role="alert">{{ expenseError() }}</div>
+        }
+        <button class="btn btn-primary mt-3" type="submit" [disabled]="savingExpense()">
+          @if (savingExpense()) { <span class="spinner-border spinner-border-sm me-2"></span> }
+          <i class="bi bi-plus-lg"></i> Registrar gasto
+        </button>
+      </form>
+    </section>
+
+    <section class="panel mb-4">
+      <h2 class="h5">Ventas ({{ value.ventas.length }})</h2>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead><tr><th>Fecha</th><th>Venta</th><th>Cliente</th><th>Pago</th><th class="text-end">Subtotal</th><th class="text-end">Descuento</th><th class="text-end">Ingreso neto</th><th class="text-end">Costo</th><th class="text-end">Utilidad bruta</th></tr></thead>
+          <tbody>
+            @for (sale of value.ventas; track sale.id) {
+              <tr>
+                <td>{{ sale.fecha | date:'dd/MM/yyyy HH:mm' }}</td><td>#{{ sale.id }}</td><td>{{ sale.cliente || 'Público general' }}</td>
+                <td>{{ sale.metodoPago }}</td><td class="text-end">{{ sale.subtotal | currency:'MXN':'symbol':'1.2-2' }}</td>
+                <td class="text-end">{{ sale.descuentos | currency:'MXN':'symbol':'1.2-2' }}</td>
+                <td class="text-end">{{ sale.total | currency:'MXN':'symbol':'1.2-2' }}</td>
+                <td class="text-end">{{ sale.costoMercancia | currency:'MXN':'symbol':'1.2-2' }}</td>
+                <td class="text-end">{{ sale.utilidadBruta | currency:'MXN':'symbol':'1.2-2' }}</td>
+              </tr>
+            } @empty {
+              <tr><td colspan="9" class="text-center text-muted">No hay ventas en este mes.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel mb-4">
+      <h2 class="h5">Abastecimientos ({{ value.abastecimientos.length }})</h2>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead><tr><th>Fecha</th><th>Referencia</th><th>Proveedor</th><th class="text-end">Compra de inventario</th></tr></thead>
+          <tbody>
+            @for (supply of value.abastecimientos; track supply.id) {
+              <tr><td>{{ supply.fecha | date:'dd/MM/yyyy HH:mm' }}</td><td>#{{ supply.id }}</td><td>{{ supply.proveedor }}</td><td class="text-end">{{ supply.total | currency:'MXN':'symbol':'1.2-2' }}</td></tr>
+            } @empty {
+              <tr><td colspan="4" class="text-center text-muted">No hay abastecimientos en este mes.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel mb-4">
+      <h2 class="h5">Gastos operativos ({{ value.gastos.length }})</h2>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead><tr><th>Fecha</th><th>Categoría</th><th>Descripción</th><th class="text-end">Monto</th></tr></thead>
+          <tbody>
+            @for (expense of value.gastos; track expense.id) {
+              <tr><td>{{ expense.fecha | date:'dd/MM/yyyy HH:mm' }}</td><td>{{ expense.categoria }}</td><td>{{ expense.descripcion }}</td><td class="text-end">{{ expense.monto | currency:'MXN':'symbol':'1.2-2' }}</td></tr>
+            } @empty {
+              <tr><td colspan="4" class="text-center text-muted">No hay gastos registrados en este mes.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  }
+</main>

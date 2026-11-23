@@ -1,7 +1,7 @@
 <main class="page">
   <div class="page-heading"><div><h1>Mis compras</h1><p class="muted">Consulta el historial de tus compras.</p></div></div>
   @if (error()) { <div class="notice error">{{ error() }}</div> }
-  @if (downloadError()) { <div class="notice error mb-3" role="alert">{{ downloadError() }}</div> }
+  @if (ticketError()) { <div class="notice error mb-3" role="alert">{{ ticketError() }}</div> }
   @if (loading()) {
     <div class="empty-state"><span class="spinner-border text-primary"></span></div>
   } @else if (ventas().length === 0) {
@@ -29,7 +29,7 @@
                 <td>{{ venta.total | currency:'MXN':'symbol':'1.2-2' }}</td>
                 <td>{{ venta.puntosGanados ?? 0 }}</td>
                 <td class="text-end">
-                  <button type="button" class="btn btn-sm btn-outline-primary"
+                  <button type="button" class="btn btn-sm btn-outline-primary me-1"
                           (click)="downloadTicket(venta)" [disabled]="downloadingId() === venta.id"
                           [attr.aria-label]="'Descargar ticket ' + venta.id">
                     @if (downloadingId() === venta.id) {
@@ -38,6 +38,11 @@
                       <i class="bi bi-download"></i>
                     }
                     PDF
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline-secondary"
+                          (click)="printTicket(venta)"
+                          [attr.aria-label]="'Imprimir ticket ' + venta.id">
+                    <i class="bi bi-printer"></i>
                   </button>
                 </td>
               </tr>

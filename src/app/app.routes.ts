@@ -26,6 +26,14 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: '', component: DashboardComponent },
+      {
+        path: 'reportes/contabilidad',
+        loadComponent: () =>
+          import('./features/reportes/accounting-report.component').then(
+            (module) => module.AccountingReportComponent,
+          ),
+        canActivate: [roleGuard(['ADMINISTRADOR'])],
+      },
       { path: 'perfil', component: ProfileComponent, canActivate: [roleGuard(['CLIENTE'])] },
       { path: 'mis-compras', component: PurchaseHistoryComponent, canActivate: [roleGuard(['CLIENTE'])] },
       { path: 'productos', component: ProductListComponent, canActivate: [roleGuard(['ADMINISTRADOR', 'CAJERO'])] },

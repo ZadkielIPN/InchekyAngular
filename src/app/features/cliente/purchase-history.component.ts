@@ -17,7 +17,7 @@ export class PurchaseHistoryComponent implements OnInit {
   readonly loading = signal(true);
   readonly error = signal('');
   readonly downloadingId = signal<number | null>(null);
-  readonly downloadError = signal('');
+  readonly ticketError = signal('');
 
   ngOnInit() {
     this.api.list<Venta>('ventas/mis-compras', 0, 30).subscribe({
@@ -33,16 +33,25 @@ export class PurchaseHistoryComponent implements OnInit {
   }
 
   downloadTicket(venta: Venta) {
-    this.downloadError.set('');
+    this.ticketError.set('');
     this.downloadingId.set(venta.id);
     this.tickets.downloadPdf(venta.id).subscribe({
       next: () => this.downloadingId.set(null),
       error: (error) => {
         this.downloadingId.set(null);
-        this.downloadError.set(
+        this.ticketError.set(
           this.tickets.errorMessage(error, `No se pudo descargar el ticket #${venta.id}.`),
         );
       },
     });
+  }
+
+  printTicket(venta: Venta) {
+    this.ticketError.set('');
+    if (!this.tickets.printTicket(venta)) {
+      this.ticketError.set(
+        'El navegador bloqueó la ventana de impresión. Permite las ventanas emergentes e inténtalo de nuevo.',
+      );
+    }
   }
 }

@@ -3,6 +3,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { catchError, from, map, mergeMap, of, toArray } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import type { Venta } from '../../../core/models/api.models';
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { TicketService } from '../../../core/services/ticket.service';
@@ -27,6 +28,16 @@ interface EntityDetailConfig {
 
 const fullName = (record: Rec) => `${record['nombre'] ?? ''} ${record['apellido'] ?? ''}`.trim();
 const LEVEL_DISCOUNT: Record<string, string> = { BRONCE: '0%', PLATA: '5%', ORO: '10%' };
+
+function isVenta(record: Rec | null): record is Rec & Venta {
+  return (
+    !!record &&
+    typeof record['id'] === 'number' &&
+    typeof record['fecha'] === 'string' &&
+    typeof record['total'] === 'number' &&
+    Array.isArray(record['detalles'])
+  );
+}
 
 const DETAIL_CONFIG: Record<string, EntityDetailConfig> = {
   productos: {
@@ -185,6 +196,20 @@ export class GenericEntityDetailComponent {
         this.ticketError.set(this.tickets.errorMessage(error, 'No se pudo descargar el ticket.'));
       },
     });
+  }
+
+  printTicket() {
+    this.ticketError.set('');
+    const record = this.record();
+    if (!isVenta(record)) {
+      this.ticketError.set('No se pudo preparar la impresión del ticket.');
+      return;
+    }
+    if (!this.tickets.printTicket(record)) {
+      this.ticketError.set(
+        'El navegador bloqueó la ventana de impresión. Permite las ventanas emergentes e inténtalo de nuevo.',
+      );
+    }
   }
 
   private load() {

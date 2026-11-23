@@ -121,12 +121,14 @@ export interface Administrador extends Usuario {
 export interface DetalleVenta {
   id?: number;
   productoId: number;
+  productoNombre?: string;
   cantidad: number;
   precioUnitario: number;
   promocionId?: number;
   descuentoPorcentaje?: number;
   descuentoImporte?: number;
   subtotal?: number;
+  total?: number;
 }
 
 export interface Venta {
@@ -165,4 +167,47 @@ export interface Abastecimiento {
   proveedorNombre?: string;
   detalles: DetalleAbastecimiento[];
   total: number;
+}
+
+export interface Gasto {
+  id: number;
+  fecha: string;
+  categoria: string;
+  descripcion: string;
+  monto: number;
+}
+
+export interface ReporteVenta {
+  id: number;
+  fecha: string;
+  cliente: string;
+  metodoPago: MetodoPago;
+  subtotal: number;
+  descuentos: number;
+  total: number;
+  costoMercancia: number;
+  utilidadBruta: number;
+}
+
+export interface ReporteAbastecimiento {
+  id: number;
+  fecha: string;
+  proveedor: string;
+  total: number;
+}
+
+export interface ReporteContable {
+  anio: number;
+  mes: number;
+  subtotalVentas: number;
+  descuentosVentas: number;
+  ingresosVentas: number;
+  costoMercanciaVendida: number;
+  utilidadBruta: number;
+  gastosOperativos: number;
+  utilidadNeta: number;
+  comprasInventario: number;
+  ventas: ReporteVenta[];
+  abastecimientos: ReporteAbastecimiento[];
+  gastos: Gasto[];
 }

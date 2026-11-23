@@ -45,6 +45,11 @@
       </a>
     }
     @if (auth.hasRole('ADMINISTRADOR')) {
+      <a class="card dashboard-card" routerLink="/reportes/contabilidad">
+        <i class="bi bi-graph-up-arrow"></i>
+        <strong>Reporte mensual</strong>
+        <span class="muted">Ventas, costos, gastos y utilidad</span>
+      </a>
       <a class="card dashboard-card" routerLink="/administradores">
         <i class="bi bi-person-vcard-fill"></i>
         <strong>Administradores</strong>

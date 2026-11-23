@@ -128,6 +128,8 @@ El backend valida stock, calcula promociones, descuento de nivel, descuento por 
 
 La lista de ventas usa el componente generico y ahora muestra el ID como primera columna. El ID proviene de `VentaResponse.id`; no se genera en Angular.
 
+La impresion fisica esta disponible al registrar una venta, desde el historial de compras y el detalle de ventas. Abre el dialogo de impresion del navegador con formato para rollo POS de 60 mm (58 mm imprimibles); configura ese papel en el controlador de la impresora. La descarga PDF y el envio por correo permanecen disponibles.
+
 ## 6. Promociones y fidelizacion
 
 Las promociones tienen:
@@ -154,7 +156,15 @@ Reglas actuales:
 
 Si modificas una regla, cambia primero el backend y despues ajusta la estimacion Angular.
 
-## 7. Imagenes de productos
+## 7. Reporte contable mensual
+
+El modulo `/reportes/contabilidad` esta disponible solo para administradores y consulta `GET /api/reportes/contabilidad?anio=AAAA&mes=M`. Los gastos operativos se capturan mediante `POST /api/gastos`; ambos endpoints validan el rol en el interceptor del backend.
+
+La utilidad neta se calcula como ventas netas menos costo promedio ponderado de la mercancia vendida menos gastos operativos capturados. Los abastecimientos del mes aparecen por separado como compras de inventario y no se descuentan otra vez de la utilidad. El costo de cada venta se conserva en su detalle para mantener su costo historico; por eso las existencias iniciales y ajustes de stock deben registrarse como abastecimientos.
+
+El CSV es un reporte contable interno, no una declaracion fiscal ni un CFDI. No contiene calculo de impuestos, deducciones ni validacion de requisitos para presentaciones ante autoridades fiscales.
+
+## 8. Imagenes de productos
 
 Actualmente el producto puede tener una referencia de imagen y el frontend construye la URL de `uploads/productos`.
 
@@ -173,7 +183,7 @@ productos/10/uuid.webp
 
 No guardes archivos binarios grandes dentro de la tabla de productos. Valida MIME, tamano y extension en Spring Boot.
 
-## 8. Backend Spring Boot
+## 9. Backend Spring Boot
 
 La estructura principal es:
 
