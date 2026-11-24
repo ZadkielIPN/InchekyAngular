@@ -524,6 +524,14 @@ footer {
   font-size: .78rem;
 }
 .narrow-page { max-width: 850px; margin-inline: auto; }
+.narrow-page .form-card {
+  padding: 1.5rem;
+}
+@media (max-width: 576px) {
+  .narrow-page .form-card {
+    padding: 1rem;
+  }
+}
 .dashboard-card-featured { border-color: #86efac; background: linear-gradient(135deg, #f0fdf4, #fff); }
 .dashboard-card-featured i { color: #15803d; }
 .ticket-layout { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(350px, .8fr); gap: 1.25rem; align-items: start; }

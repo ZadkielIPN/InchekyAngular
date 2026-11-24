@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../../core/services/api.service';
 import { Producto } from '../../../core/models/api.models';
+import { switchMap } from 'rxjs';
 import {
   EntityDropdownComponent,
   EntityDropdownOption,
@@ -30,6 +31,7 @@ export class GenericEntityFormComponent {
     apellido: [''],
     email: ['', Validators.email],
     contrasena: [''],
+    uidNfc: [''],
     telefono: [''],
     direccion: [''],
     turno: ['MATUTINO'],
@@ -132,7 +134,16 @@ export class GenericEntityFormComponent {
     const request = this.id
       ? this.api.put(`${this.endpoint}/${this.id}`, payload)
       : this.api.post(this.endpoint, payload);
-    request.subscribe({
+    const userEndpoints = ['clientes', 'cajeros', 'administradores'];
+    const saveRequest = this.id && userEndpoints.includes(this.endpoint)
+      ? request.pipe(
+          switchMap(() => this.api.patch(
+            `usuarios/${this.id}/tarjeta-nfc`,
+            { uidNfc: this.form.controls.uidNfc.value.trim() || null },
+          )),
+        )
+      : request;
+    saveRequest.subscribe({
       next: () => void this.router.navigate(['/', this.endpoint]),
       error: (error) => this.error.set(error.error?.message ?? 'No se pudo guardar.'),
     });

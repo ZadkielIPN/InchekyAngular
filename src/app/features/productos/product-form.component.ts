@@ -54,7 +54,7 @@ export class ProductFormComponent {
     }
     const value = this.form.getRawValue();
     const request = this.id
-      ? this.service.update(this.id, value)
+      ? this.service.update(this.id, value, this.file)
       : this.service.create(value, this.file);
     request.subscribe({
       next: () => void this.router.navigate(['/productos']),

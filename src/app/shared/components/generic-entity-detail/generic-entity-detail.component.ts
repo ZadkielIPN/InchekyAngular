@@ -153,6 +153,10 @@ export class GenericEntityDetailComponent {
   readonly names = signal<Record<number, string>>({});
   readonly downloading = signal(false);
   readonly ticketError = signal('');
+  readonly showEmailForm = signal(false);
+  readonly emailDestination = signal('');
+  readonly sendingEmail = signal(false);
+  readonly emailSuccess = signal('');
 
   readonly heading = computed(() => {
     const record = this.record();
@@ -212,12 +216,54 @@ export class GenericEntityDetailComponent {
     }
   }
 
+  toggleEmailForm() {
+    this.ticketError.set('');
+    this.emailSuccess.set('');
+    if (!this.showEmailForm() && !this.emailDestination()) {
+      this.emailDestination.set(this.record()?.['clienteEmail'] ?? '');
+    }
+    this.showEmailForm.update((visible) => !visible);
+  }
+
+  sendTicketEmail() {
+    this.ticketError.set('');
+    this.emailSuccess.set('');
+    const destination = this.emailDestination().trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(destination)) {
+      this.ticketError.set('Escribe un correo válido.');
+      return;
+    }
+
+    this.sendingEmail.set(true);
+    this.tickets.sendByEmail(this.id, destination).subscribe({
+      next: () => {
+        this.sendingEmail.set(false);
+        this.emailSuccess.set(`El ticket se está enviando a ${destination}.`);
+      },
+      error: (error) => {
+        this.sendingEmail.set(false);
+        this.ticketError.set(this.tickets.errorMessage(error, 'No se pudo enviar el ticket por correo.'));
+      },
+    });
+  }
+
   private load() {
     this.api.get<Rec>(`${this.endpoint}/${this.id}`).subscribe({
       next: (record) => {
         this.record.set(record);
         this.loading.set(false);
         this.resolveNames(record);
+        if (this.endpoint === 'ventas' && record['clienteId']) {
+          this.api.get<Rec>(`clientes/${record['clienteId']}`).subscribe({
+            next: (client) => {
+              record['clienteEmail'] = client['email'];
+              if (!this.emailDestination()) this.emailDestination.set(client['email'] ?? '');
+            },
+            error: () => this.ticketError.set(
+              'No se pudo cargar el correo del cliente; puedes escribir uno manualmente.',
+            ),
+          });
+        }
       },
       error: (error) => {
         this.loading.set(false);

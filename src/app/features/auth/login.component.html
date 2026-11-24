@@ -45,6 +45,39 @@
       }
       Iniciar sesión
     </button>
+    <div class="text-center mt-2">
+      @if (nfcMode()) {
+        <button class="btn btn-link" type="button" (click)="disableNfcLogin()">
+          Usar correo y contraseña
+        </button>
+        <div
+          class="nfc-login mt-2"
+          [class.nfc-error]="nfcStatus() === 'error'"
+          role="status"
+          aria-live="polite"
+        >
+          <i class="bi bi-credit-card-2-front" aria-hidden="true"></i>
+          <span>{{ nfcMessage() || 'Acerca la tarjeta al lector' }}</span>
+          <input
+            #nfcInput
+            class="visually-hidden"
+            type="text"
+            name="nfcUid"
+            autocomplete="off"
+            inputmode="numeric"
+            aria-label="Lectura de tarjeta NFC"
+            [value]="nfcUid()"
+            (input)="onNfcInput(nfcInput.value)"
+            (keydown.enter)="$event.preventDefault(); submitNfc()"
+            [disabled]="nfcStatus() === 'loading'"
+          />
+        </div>
+      } @else {
+        <button class="btn btn-link" type="button" (click)="enableNfcLogin()">
+          Iniciar sesión con tarjeta NFC
+        </button>
+      }
+    </div>
     <p class="text-center mt-3 mb-0">
       ¿Eres cliente nuevo? <a routerLink="/registro">Crear cuenta</a>
     </p>

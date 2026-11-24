@@ -10,3 +10,22 @@
   object-position: 1px center;
   transform: translateY(-2px);
 }
+
+.nfc-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 3.25rem;
+  padding: 1rem;
+  border: 1px solid #bfdbfe;
+  border-radius: 0.75rem;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.nfc-login.nfc-error {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}

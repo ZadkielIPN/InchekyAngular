@@ -66,6 +66,7 @@ export interface Usuario {
   apellido: string;
   email: string;
   rol: Rol;
+  uidNfc?: string;
 }
 
 export interface Proveedor {

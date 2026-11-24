@@ -52,6 +52,32 @@
           (ngModelChange)="onClientChange($event)"
           name="cliente"
         />
+        <div class="d-flex align-items-center gap-2">
+          @if (nfcClientMode()) {
+            <button class="btn btn-sm btn-outline-secondary" type="button" (click)="disableNfcClientSelection()">
+              Seleccionar manualmente
+            </button>
+            <span class="muted small">o acerca la tarjeta al lector</span>
+            <input
+              #clientNfcInput
+              class="visually-hidden"
+              type="text"
+              autocomplete="off"
+              inputmode="numeric"
+              aria-label="Lectura de tarjeta NFC del cliente"
+              [value]="nfcClientUid()"
+              (input)="onNfcClientInput(clientNfcInput.value)"
+              (keydown.enter)="$event.preventDefault(); submitNfcClient()"
+            />
+          } @else {
+            <button class="btn btn-sm btn-outline-primary" type="button" (click)="enableNfcClientSelection()">
+              <i class="bi bi-credit-card-2-front"></i> Seleccionar por NFC
+            </button>
+          }
+        </div>
+        @if (nfcClientMessage()) {
+          <div class="notice" role="status" aria-live="polite">{{ nfcClientMessage() }}</div>
+        }
 
         @if (auth.hasRole('ADMINISTRADOR')) {
           <label class="form-label" for="cajero">Cajero *</label>
@@ -64,6 +90,32 @@
             (ngModelChange)="selectedCashierId.set($event)"
             name="cajero"
           />
+          <div class="d-flex align-items-center gap-2">
+            @if (nfcCashierMode()) {
+              <button class="btn btn-sm btn-outline-secondary" type="button" (click)="disableNfcCashierSelection()">
+                Seleccionar manualmente
+              </button>
+              <span class="muted small">o acerca la tarjeta del cajero</span>
+              <input
+                #cashierNfcInput
+                class="visually-hidden"
+                type="text"
+                autocomplete="off"
+                inputmode="numeric"
+                aria-label="Lectura de tarjeta NFC del cajero"
+                [value]="nfcCashierUid()"
+                (input)="onNfcCashierInput(cashierNfcInput.value)"
+                (keydown.enter)="$event.preventDefault(); submitNfcCashier()"
+              />
+            } @else {
+              <button class="btn btn-sm btn-outline-primary" type="button" (click)="enableNfcCashierSelection()">
+                <i class="bi bi-credit-card-2-front"></i> Seleccionar cajero por NFC
+              </button>
+            }
+          </div>
+          @if (nfcCashierMessage()) {
+            <div class="notice" role="status" aria-live="polite">{{ nfcCashierMessage() }}</div>
+          }
         } @else {
           <label class="form-label" for="cajero">Cajero</label>
           <input id="cajero" class="form-control" [value]="cashierName()" disabled />

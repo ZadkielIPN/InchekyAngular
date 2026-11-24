@@ -44,6 +44,10 @@ export class ApiService {
     return this.http.put<T>(`${this.baseUrl}/${path}`, body);
   }
 
+  patch<T>(path: string, body: unknown) {
+    return this.http.patch<T>(`${this.baseUrl}/${path}`, body);
+  }
+
   delete(path: string) {
     return this.http.delete<void>(`${this.baseUrl}/${path}`);
   }

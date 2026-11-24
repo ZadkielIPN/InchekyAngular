@@ -5,6 +5,7 @@ import { ApiService } from '../../../core/services/api.service';
 import { LoadingComponent } from '../loading/loading.component';
 import { PageResponse } from '../../../core/models/api.models';
 import { AuthService } from '../../../core/services/auth.service';
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
 @Component({
   selector: 'app-generic-entity-list',
@@ -19,6 +20,8 @@ export class GenericEntityListComponent {
   readonly title = this.route.snapshot.data['title'] as string;
   readonly endpoint = this.route.snapshot.data['endpoint'] as string;
   readonly columns = this.route.snapshot.data['columns'] as string[];
+  readonly searchPlaceholder = this.route.snapshot.data['searchPlaceholder'] as string
+    ?? 'Buscar por nombre, correo o descripción...';
   readonly isAdmin = this.auth.hasRole('ADMINISTRADOR');
   readonly canCreate = this.route.snapshot.data['canCreate'] !== false
     && (this.isAdmin || this.endpoint === 'ventas');
@@ -29,6 +32,7 @@ export class GenericEntityListComponent {
   readonly error = signal('');
   currentPage = 0;
   query = '';
+  private readonly salesSearch$ = new Subject<string>();
 
   displayColumn(column: string) {
     const labels: Record<string, string> = {
@@ -55,11 +59,18 @@ export class GenericEntityListComponent {
 
   constructor() {
     this.load();
+    this.salesSearch$
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe((query) => {
+        this.query = query;
+        this.currentPage = 0;
+        this.load();
+      });
   }
 
   load() {
     this.loading.set(true);
-    this.api.list<Record<string, unknown>>(this.endpoint, this.currentPage, 10, { q: this.query }).subscribe({
+    this.api.list<Record<string, unknown>>(this.endpoint, this.currentPage, 20, { q: this.query }).subscribe({
       next: (value) => this.page.set(value),
       error: () => this.error.set('No se pudo cargar la información.'),
       complete: () => this.loading.set(false),
@@ -69,6 +80,13 @@ export class GenericEntityListComponent {
   search() {
     this.currentPage = 0;
     this.load();
+  }
+
+  onQueryChange(value: string) {
+    if (this.endpoint === 'ventas') {
+      this.query = value;
+      this.salesSearch$.next(value);
+    }
   }
 
   remove(id: unknown) {

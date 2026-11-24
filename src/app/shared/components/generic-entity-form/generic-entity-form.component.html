@@ -35,6 +35,24 @@
             {{ id ? 'Déjala vacía para conservar la contraseña actual.' : 'Debe tener entre 8 y 20 caracteres.' }}
           </small>
         </div>
+        @if (id) {
+          <div class="col-md-6">
+            <label class="form-label" for="uidNfc">UID de tarjeta NFC (opcional)</label>
+            <input
+              id="uidNfc"
+              class="form-control"
+              type="text"
+              formControlName="uidNfc"
+              autocomplete="off"
+              inputmode="numeric"
+              maxlength="255"
+              (keydown.enter)="$event.preventDefault()"
+            />
+            <small class="form-text text-muted">
+              Escribe el UID o escanea la tarjeta. Déjalo vacío para quitarla.
+            </small>
+          </div>
+        }
         @if (endpoint === 'cajeros') {
           <div class="col-md-6">
             <label class="form-label" for="turno">Turno</label>

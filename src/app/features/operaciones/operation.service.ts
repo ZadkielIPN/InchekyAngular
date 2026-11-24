@@ -26,8 +26,16 @@ export class OperationService {
     return this.api.list<Cliente>('clientes', 0, 100);
   }
 
+  clientByNfc(uidNfc: string) {
+    return this.api.get<Cliente>(`clientes/tarjeta-nfc?uidNfc=${encodeURIComponent(uidNfc)}`);
+  }
+
   cashiers() {
     return this.api.list<Cajero>('cajeros', 0, 100);
+  }
+
+  cashierByNfc(uidNfc: string) {
+    return this.api.get<Cajero>(`cajeros/tarjeta-nfc?uidNfc=${encodeURIComponent(uidNfc)}`);
   }
 
   promotions() {

@@ -51,6 +51,30 @@
           </article>
         }
       </div>
+      @if (page(); as pagination) {
+        <div class="d-flex justify-content-center align-items-center gap-3 mt-4">
+          <button
+            class="btn btn-outline-primary"
+            type="button"
+            (click)="previous()"
+            [disabled]="pagination.first || loading()"
+          >
+            Anterior
+          </button>
+          <span class="muted">
+            Página {{ pagination.number + 1 }} de {{ pagination.totalPages }}
+            · {{ pagination.totalElements }} productos
+          </span>
+          <button
+            class="btn btn-outline-primary"
+            type="button"
+            (click)="next()"
+            [disabled]="pagination.last || loading()"
+          >
+            Siguiente
+          </button>
+        </div>
+      }
     </div>
   }
 </main>

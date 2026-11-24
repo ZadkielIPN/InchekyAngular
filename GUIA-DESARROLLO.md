@@ -8,7 +8,7 @@ El proyecto esta dividido en dos repositorios:
 
 ```text
 Frontend Angular:
-C:\Users\Zadki\IdeaProjects\copilot-worktrees\InchekyAngular\zadkielipn-animated-guide
+C:\Users\Zadki\WebstormProjects\InchekyAngular
 
 Backend Spring Boot:
 C:\Users\Zadki\IdeaProjects\Incheky
@@ -64,17 +64,20 @@ this.api.put<Producto>('productos/5', payload);
 this.api.delete('productos/5');
 ```
 
-Las rutas no deben repetir `http://localhost:8080`. La URL base esta en `src/environments/environment.ts`.
+Las rutas no deben repetir `http://localhost:8080`. La URL base esta en:
+
+- Desarrollo: `src/environments/environment.ts`.
+- Produccion: `src/environments/environment.prod.ts`.
 
 Los listados paginados reciben:
 
 ```text
 page=0
-size=10
+size=20
 q=texto-opcional
 ```
 
-Cuando agregues un nuevo buscador, confirma que el controlador, servicio y repositorio de Spring Boot tambien procesen `q`.
+La API acepta el tamano mediante `Pageable`; los componentes de interfaz pueden elegir un tamano distinto. Los listados genericos y el catalogo del cliente usan actualmente 20 elementos por pagina. Cuando agregues un nuevo buscador, confirma que el controlador, servicio y repositorio de Spring Boot tambien procesen `q`.
 
 ## 4. Autenticacion y roles
 
@@ -166,16 +169,20 @@ El CSV es un reporte contable interno, no una declaracion fiscal ni un CFDI. No 
 
 ## 8. Imagenes de productos
 
-Actualmente el producto puede tener una referencia de imagen y el frontend construye la URL de `uploads/productos`.
+Actualmente el producto guarda el nombre de archivo y el frontend construye la URL de `uploads/productos`. Spring Boot guarda las imagenes en `<UPLOAD_DIR>/productos` y publica el directorio configurado mediante `/uploads/**`.
 
-Para desarrollo local esta estrategia es suficiente. Para produccion se recomienda migrar a un `StorageService` con almacenamiento de objetos:
+La variable de entorno `UPLOAD_DIR` define el directorio base. En local, el valor predeterminado es `uploads`, por lo que las imagenes se almacenan en `uploads/productos`. En Azure, configura `UPLOAD_DIR` con una ruta persistente y escribible por la aplicacion; el almacenamiento efimero local del App Service puede perder archivos al reiniciar o desplegar. Confirma la persistencia y el respaldo en la configuracion real de Azure antes de depender de ella.
+
+La edicion envia la nueva imagen como multipart. Si se reemplaza una imagen local, el backend elimina la anterior despues del commit. No borres manualmente el directorio configurado ni guardes secretos/credenciales en el repositorio.
+
+Si mas adelante se requiere escalado horizontal, CDN o almacenamiento duradero administrado, se puede migrar a un `StorageService` con Azure Blob Storage:
 
 ```text
-MinIO en local
-S3, Cloudflare R2 o Azure Blob en produccion
+Emulador compatible con Azure Blob en local
+Azure Blob Storage en produccion
 ```
 
-La base de datos debe guardar una clave como:
+En esa migracion futura, la base de datos podria guardar una clave como (actualmente guarda solo el nombre del archivo):
 
 ```text
 productos/10/uuid.webp
@@ -217,19 +224,31 @@ Usa `@Transactional` para operaciones que modifican varias entidades o stock. Us
 
 ## 9. Configuracion local
 
-El backend usa MySQL y una variable de entorno para la contrasena:
+El backend usa MySQL y estas variables de entorno, definidas en `src/main/resources/application.yaml`:
 
 ```powershell
 Set-Location C:\Users\Zadki\IdeaProjects\Incheky
-$env:PASSWORD_DB="TU_CONTRASENA"
+$env:DB_HOST="localhost"
+$env:DB_NAME="incheky"
+$env:DB_USER="TU_USUARIO"
+$env:DB_PASSWORD="TU_CONTRASENA"
+$env:MAIL_PASSWORD="TU_CONTRASENA_DE_APLICACION"
+$env:UPLOAD_DIR="uploads"
+$env:CORS_ALLOWED_ORIGINS="http://localhost:4200"
+$env:COOKIE_SAME_SITE="lax"
+$env:COOKIE_SECURE="false"
 .\mvnw.cmd spring-boot:run
 ```
+
+`PORT` es opcional y por defecto usa `8080`. No guardes valores reales de contrasenas, tokens ni claves en el repositorio; configura los secretos mediante variables de entorno o el almacen de secretos de Azure.
+
+Como el frontend de Azure Static Web Apps y el backend de App Service suelen tener dominios distintos, en produccion la cookie de sesion puede requerir `COOKIE_SAME_SITE="none"` junto con `COOKIE_SECURE="true"` y HTTPS. Si se usa un dominio personalizado que hace que ambos servicios sean same-site, confirma la politica adecuada para esa topologia. La API ya permite credenciales CORS; `CORS_ALLOWED_ORIGINS` debe contener el origen exacto del frontend, nunca `*`.
 
 El frontend:
 
 ```powershell
-Set-Location C:\Users\Zadki\IdeaProjects\copilot-worktrees\InchekyAngular\zadkielipn-animated-guide
-npm install
+Set-Location C:\Users\Zadki\WebstormProjects\InchekyAngular
+npm ci
 npm start
 ```
 
@@ -249,7 +268,6 @@ Frontend:
 ```powershell
 npm run build
 npm test -- --watch=false
-git diff --check
 ```
 
 Backend:
@@ -259,9 +277,20 @@ Backend:
 .\mvnw.cmd test
 ```
 
-Las pruebas completas del backend requieren que MySQL este disponible y que `PASSWORD_DB` sea correcta. Si aparece `Access denied for user 'root'@'localhost'`, revisa la variable de entorno y no cambies las credenciales en el repositorio.
+Las pruebas unitarias enfocadas no requieren una base de datos. La prueba `InchekyApplicationTests` inicia el contexto completo y necesita que MySQL este disponible y que `DB_HOST`, `DB_NAME`, `DB_USER` y `DB_PASSWORD` sean correctas. Si aparece un error de acceso a MySQL, revisa esas variables y no cambies credenciales en el repositorio.
 
-## 11. Flujo de trabajo Git
+El build Angular tiene un presupuesto inicial de advertencia de 850 kB y de error de 1 MB. El umbral es una alerta de mantenimiento, no una optimizacion: revisa la carga diferida y el tamano real si el bundle vuelve a acercarse al limite de error.
+
+## 11. Despliegue actual en Azure
+
+Los workflows estan en los repositorios y se ejecutan al actualizar `master`:
+
+- Frontend: `.github/workflows/azure-static-web-apps-gentle-meadow-09d0cae1e.yml` despliega Angular a Azure Static Web Apps. El workflow usa `dist/InchekyAngular/browser` y el secreto `AZURE_STATIC_WEB_APPS_API_TOKEN_GENTLE_MEADOW_09D0CAE1E`.
+- Backend: `C:\Users\Zadki\IdeaProjects\Incheky\.github\workflows\master_incheky-backend.yml` construye un JAR con Maven y lo despliega a Azure App Service `Incheky-Backend`. Usa autenticacion federada de Azure configurada en GitHub Actions.
+
+El workflow backend actualmente construye con `-DskipTests`; el workflow frontend no ejecuta `npm test` de forma explicita. Ejecuta las pruebas y builds localmente antes de integrar cambios. Configura en Azure App Service las variables necesarias del backend (`DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `MAIL_PASSWORD`, `UPLOAD_DIR`, `CORS_ALLOWED_ORIGINS`, `COOKIE_SAME_SITE`, `COOKIE_SECURE` y, si aplica, `PORT`). En dominios separados, configura `COOKIE_SAME_SITE=None` y `COOKIE_SECURE=true` sobre HTTPS; permite solo el origen real del frontend en `CORS_ALLOWED_ORIGINS` (no uses `*` con credenciales).
+
+## 12. Flujo de trabajo Git
 
 Antes de comenzar:
 
@@ -290,7 +319,7 @@ git push origin <rama>
 
 Mantén los commits enfocados. No mezcles cambios del backend y frontend si pueden revisarse por separado.
 
-## 12. Checklist para una nueva funcionalidad
+## 13. Checklist para una nueva funcionalidad
 
 - [ ] Entiendo el endpoint y el DTO del backend.
 - [ ] La entidad tiene validaciones y mapper.

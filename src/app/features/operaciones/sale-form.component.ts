@@ -1,5 +1,5 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, ElementRef, inject, signal, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
@@ -37,7 +37,15 @@ export class SaleFormComponent {
   readonly error = signal('');
   readonly searchQuery = signal('');
   readonly selectedClientId = signal<number | null>(null);
+  readonly nfcClientMode = signal(false);
+  readonly nfcClientUid = signal('');
+  readonly nfcClientMessage = signal('');
+  @ViewChild('clientNfcInput') private clientNfcInput?: ElementRef<HTMLInputElement>;
   readonly selectedCashierId = signal<number | null>(null);
+  readonly nfcCashierMode = signal(false);
+  readonly nfcCashierUid = signal('');
+  readonly nfcCashierMessage = signal('');
+  @ViewChild('cashierNfcInput') private cashierNfcInput?: ElementRef<HTMLInputElement>;
   readonly metodoPago = signal('EFECTIVO');
   readonly puntosUtilizados = signal(0);
   readonly confirmedSale = signal<Venta | null>(null);
@@ -130,6 +138,112 @@ export class SaleFormComponent {
   onClientChange(value: number | null) {
     this.selectedClientId.set(value);
     this.puntosUtilizados.set(0);
+  }
+
+  enableNfcClientSelection() {
+    this.nfcClientMode.set(true);
+    this.nfcClientUid.set('');
+    this.nfcClientMessage.set('');
+    setTimeout(() => this.clientNfcInput?.nativeElement.focus());
+  }
+
+  disableNfcClientSelection() {
+    this.nfcClientMode.set(false);
+    this.nfcClientUid.set('');
+    this.nfcClientMessage.set('');
+  }
+
+  onNfcClientInput(value: string) {
+    this.nfcClientUid.set(value);
+  }
+
+  submitNfcClient() {
+    const uidNfc = this.nfcClientUid().trim();
+    if (!uidNfc) {
+      this.nfcClientMessage.set('No se pudo leer la tarjeta. Selecciona un cliente manualmente.');
+      return;
+    }
+
+    this.nfcClientMessage.set('Buscando cliente...');
+    this.service.clientByNfc(uidNfc).subscribe({
+      next: (client) => {
+        if (!this.clients().some((item) => item.id === client.id)) {
+          this.clients.update((clients) => [...clients, client]);
+        }
+        this.onClientChange(client.id);
+        this.nfcClientMessage.set(`Cliente seleccionado: ${client.nombre} ${client.apellido}`);
+        this.clearNfcClientInput();
+      },
+      error: (error) => {
+        this.nfcClientMessage.set(
+          error.error?.message ?? 'No se encontró un cliente con esa tarjeta. Puedes seleccionarlo manualmente.',
+        );
+        this.clearNfcClientInput();
+      },
+    });
+  }
+
+  private clearNfcClientInput() {
+    this.nfcClientUid.set('');
+    if (this.clientNfcInput) {
+      this.clientNfcInput.nativeElement.value = '';
+      if (this.nfcClientMode()) {
+        setTimeout(() => this.clientNfcInput?.nativeElement.focus());
+      }
+    }
+  }
+
+  enableNfcCashierSelection() {
+    this.nfcCashierMode.set(true);
+    this.nfcCashierUid.set('');
+    this.nfcCashierMessage.set('');
+    setTimeout(() => this.cashierNfcInput?.nativeElement.focus());
+  }
+
+  disableNfcCashierSelection() {
+    this.nfcCashierMode.set(false);
+    this.nfcCashierUid.set('');
+    this.nfcCashierMessage.set('');
+  }
+
+  onNfcCashierInput(value: string) {
+    this.nfcCashierUid.set(value);
+  }
+
+  submitNfcCashier() {
+    const uidNfc = this.nfcCashierUid().trim();
+    if (!uidNfc) {
+      this.nfcCashierMessage.set('No se pudo leer la tarjeta. Selecciona un cajero manualmente.');
+      return;
+    }
+
+    this.nfcCashierMessage.set('Buscando cajero...');
+    this.service.cashierByNfc(uidNfc).subscribe({
+      next: (cashier) => {
+        if (!this.cashiers().some((item) => item.id === cashier.id)) {
+          this.cashiers.update((cashiers) => [...cashiers, cashier]);
+        }
+        this.selectedCashierId.set(cashier.id);
+        this.nfcCashierMessage.set(`Cajero seleccionado: ${cashier.nombre} ${cashier.apellido}`);
+        this.clearNfcCashierInput();
+      },
+      error: (error) => {
+        this.nfcCashierMessage.set(
+          error.error?.message ?? 'No se encontró un cajero con esa tarjeta. Puedes seleccionarlo manualmente.',
+        );
+        this.clearNfcCashierInput();
+      },
+    });
+  }
+
+  private clearNfcCashierInput() {
+    this.nfcCashierUid.set('');
+    if (this.cashierNfcInput) {
+      this.cashierNfcInput.nativeElement.value = '';
+      if (this.nfcCashierMode()) {
+        setTimeout(() => this.cashierNfcInput?.nativeElement.focus());
+      }
+    }
   }
 
   onPointsChange(value: number) {

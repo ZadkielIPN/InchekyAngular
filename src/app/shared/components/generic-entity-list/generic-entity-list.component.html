@@ -19,7 +19,8 @@
       class="form-control"
       name="query"
       [(ngModel)]="query"
-      placeholder="Buscar por nombre, correo o descripción..."
+      (ngModelChange)="onQueryChange($event)"
+      [placeholder]="searchPlaceholder"
     />
     <button class="btn btn-outline-primary" type="submit">
       <i class="bi bi-search"></i> Buscar

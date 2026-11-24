@@ -3,7 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
-import { Producto } from '../../core/models/api.models';
+import { PageResponse, Producto } from '../../core/models/api.models';
 import { ProductImageComponent } from '../../shared/components/product-image/product-image.component';
 
 @Component({
@@ -15,9 +15,12 @@ import { ProductImageComponent } from '../../shared/components/product-image/pro
 export class ClientHomeComponent {
   private readonly api = inject(ApiService);
   readonly productos = signal<Producto[]>([]);
+  readonly page = signal<PageResponse<Producto> | null>(null);
   readonly loading = signal(true);
   readonly error = signal('');
   readonly query = signal('');
+  readonly pageSize = 20;
+  currentPage = 0;
   private readonly search$ = new Subject<string>();
 
   constructor() {
@@ -27,11 +30,12 @@ export class ClientHomeComponent {
         distinctUntilChanged(),
         switchMap((query) => {
           this.loading.set(true);
-          return this.api.list<Producto>('productos/catalogo', 0, 24, { q: query });
+          return this.api.list<Producto>('productos/catalogo', this.currentPage, this.pageSize, { q: query });
         }),
       )
       .subscribe({
         next: (page) => {
+          this.page.set(page);
           this.productos.set(page.content);
           this.error.set('');
           this.loading.set(false);
@@ -46,15 +50,31 @@ export class ClientHomeComponent {
   }
 
   onSearch(value: string) {
-    this.query.set(value);
-    this.search$.next(value.trim());
+    const query = value.trim();
+    this.query.set(query);
+    this.currentPage = 0;
+    this.search$.next(query);
   }
 
+  previous() {
+    if (this.currentPage > 0) {
+      this.currentPage--;
+      this.load(this.query());
+    }
+  }
+
+  next() {
+    if (this.page() && !this.page()!.last) {
+      this.currentPage++;
+      this.load(this.query());
+    }
+  }
 
   private load(query: string) {
     this.loading.set(true);
-    this.api.list<Producto>('productos/catalogo', 0, 24, { q: query }).subscribe({
+    this.api.list<Producto>('productos/catalogo', this.currentPage, this.pageSize, { q: query }).subscribe({
       next: (page) => {
+        this.page.set(page);
         this.productos.set(page.content);
         this.error.set('');
         this.loading.set(false);

@@ -30,6 +30,21 @@ export class AuthService {
       );
   }
 
+  loginNfc(uidNfc: string) {
+    this.loading.set(true);
+    return this.http
+      .post<UsuarioSession>(`${environment.apiUrl}/auth/login/nfc`, {
+        uidNfc: uidNfc.trim(),
+      })
+      .pipe(
+        tap((user) => {
+          this.session.set(user);
+          localStorage.setItem('incheky-session', JSON.stringify(user));
+        }),
+        finalize(() => this.loading.set(false)),
+      );
+  }
+
   register(data: {
     nombre: string;
     apellido: string;

@@ -18,6 +18,10 @@
                 [disabled]="loading() || !record()">
           <i class="bi bi-printer"></i> Imprimir (60 mm)
         </button>
+        <button class="btn btn-outline-primary" type="button" (click)="toggleEmailForm()"
+                [disabled]="loading() || !record()" [attr.aria-expanded]="showEmailForm()">
+          <i class="bi bi-envelope"></i> Enviar por correo
+        </button>
       }
       @if (canEdit) {
         <a class="btn btn-primary" [routerLink]="['/', endpoint, id, 'editar']">
@@ -32,6 +36,29 @@
   } @else {
     @if (error()) { <div class="notice error mb-3" role="alert">{{ error() }}</div> }
     @if (ticketError()) { <div class="notice error mb-3" role="alert">{{ ticketError() }}</div> }
+    @if (emailSuccess()) { <div class="notice mb-3" role="status">{{ emailSuccess() }}</div> }
+    @if (showEmailForm() && endpoint === 'ventas') {
+      <form class="panel mb-3" (ngSubmit)="sendTicketEmail()">
+        <label class="form-label" for="ticketEmail">Enviar ticket a</label>
+        <div class="input-group">
+          <input
+            id="ticketEmail"
+            class="form-control"
+            type="email"
+            name="ticketEmail"
+            required
+            autocomplete="email"
+            [value]="emailDestination()"
+            (input)="emailDestination.set($any($event.target).value)"
+            placeholder="correo@ejemplo.com"
+          />
+          <button class="btn btn-primary" type="submit" [disabled]="sendingEmail()">
+            @if (sendingEmail()) { <span class="spinner-border spinner-border-sm me-1"></span> }
+            Enviar
+          </button>
+        </div>
+      </form>
+    }
 
     @if (record(); as r) {
       @if (rows().length) {
