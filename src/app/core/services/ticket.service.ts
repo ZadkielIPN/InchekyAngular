@@ -22,7 +22,9 @@ export class TicketService {
 
     printWindow.opener = null;
     printWindow.document.open();
-    printWindow.document.write(createTicketPrintDocument(venta));
+    printWindow.document.write(
+      createTicketPrintDocument(venta, new URL('/images/logo.png', window.location.origin).href),
+    );
     printWindow.document.close();
     return true;
   }

@@ -48,7 +48,7 @@ function saleDate(value: string): string {
   return Number.isNaN(date.getTime()) ? value : date.toLocaleString('es-MX');
 }
 
-export function createTicketPrintDocument(venta: Venta): string {
+export function createTicketPrintDocument(venta: Venta, logoUrl: string): string {
   const cashier = venta.cajeroNombre?.replace(/^\d+\s*-\s*/, '') || 'N/A';
   const client = venta.clienteNombre || 'Público General';
   const items = (venta.detalles ?? []).map(detailMarkup).join('');
@@ -112,7 +112,7 @@ export function createTicketPrintDocument(venta: Venta): string {
     <button type="button" onclick="window.close()">Cerrar</button>
   </nav>
   <main class="ticket">
-    <img class="ticket-logo" src="/images/logo.png" alt="Incheky">
+    <img class="ticket-logo" src="${escapeHtml(logoUrl)}" alt="Incheky">
     <h1>INCHEKI STORE</h1>
     <div class="center muted">Ticket de venta #${venta.id}</div>
     <hr class="rule">
