@@ -9,13 +9,24 @@ import {
   Proveedor,
   Venta,
 } from '../../core/models/api.models';
+import { EMPTY, expand, reduce } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class OperationService {
   private readonly api = inject(ApiService);
 
   products() {
-    return this.api.list<Producto>('productos', 0, 100);
+    return this.api.list<Producto>('productos', 0, 100).pipe(
+      expand((page) =>
+        page.number + 1 < page.totalPages
+          ? this.api.list<Producto>('productos', page.number + 1, 100)
+          : EMPTY,
+      ),
+      reduce((products, page) => {
+        products.push(...page.content);
+        return products;
+      }, [] as Producto[]),
+    );
   }
 
   catalogProducts(query = '') {

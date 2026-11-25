@@ -9,6 +9,11 @@ export interface GastoRequest {
   monto: number;
 }
 
+export interface AjusteCostosDatosPruebaResponse {
+  productosActualizados: number;
+  detallesVentaActualizados: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AccountingService {
   private readonly api = inject(ApiService);
@@ -21,5 +26,12 @@ export class AccountingService {
 
   createExpense(value: GastoRequest) {
     return this.api.post<Gasto>('gastos', value);
+  }
+
+  adjustTestCosts() {
+    return this.api.post<AjusteCostosDatosPruebaResponse>(
+      'reportes/ajustar-costos-datos-prueba-margen',
+      {},
+    );
   }
 }

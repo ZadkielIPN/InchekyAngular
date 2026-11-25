@@ -1,7 +1,11 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { GastoRequest, AccountingService } from './accounting.service';
+import {
+  AjusteCostosDatosPruebaResponse,
+  GastoRequest,
+  AccountingService,
+} from './accounting.service';
 import { ReporteContable } from '../../core/models/api.models';
 import { saveBlob } from '../../core/utils/file-download';
 
@@ -21,6 +25,9 @@ export class AccountingReportComponent {
   readonly savingExpense = signal(false);
   readonly error = signal('');
   readonly expenseError = signal('');
+  readonly adjustingCosts = signal(false);
+  readonly costAdjustmentMessage = signal('');
+  readonly costAdjustmentError = signal('');
 
   readonly expenseForm = this.fb.nonNullable.group({
     fecha: [this.localDateTime(), Validators.required],
@@ -81,6 +88,33 @@ export class AccountingReportComponent {
         this.savingExpense.set(false);
       },
       complete: () => this.savingExpense.set(false),
+    });
+  }
+
+  adjustTestCosts() {
+    if (this.adjustingCosts() || !window.confirm(
+      'Este ajuste reemplazará el costo promedio de todos los productos y el costo histórico de las ventas elegibles con estimaciones del 80%. Úsalo solo con datos de prueba. ¿Deseas continuar?',
+    )) {
+      return;
+    }
+
+    this.adjustingCosts.set(true);
+    this.costAdjustmentMessage.set('');
+    this.costAdjustmentError.set('');
+    this.service.adjustTestCosts().subscribe({
+      next: (result: AjusteCostosDatosPruebaResponse) => {
+        this.costAdjustmentMessage.set(
+          `Ajuste aplicado: ${result.productosActualizados} productos y ${result.detallesVentaActualizados} líneas históricas actualizadas.`,
+        );
+        this.loadReport();
+      },
+      error: (error) => {
+        this.costAdjustmentError.set(
+          error.error?.message ?? 'No se pudieron ajustar los costos de prueba.',
+        );
+        this.adjustingCosts.set(false);
+      },
+      complete: () => this.adjustingCosts.set(false),
     });
   }
 

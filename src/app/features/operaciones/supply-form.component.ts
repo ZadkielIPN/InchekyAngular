@@ -32,23 +32,29 @@ export class SupplyFormComponent {
   });
 
   constructor() {
-    this.service.products().subscribe((page) => {
-      this.products.set(page.content);
-      this.productOptions.set(page.content.map((product) => ({
-        id: product.id,
-        label: product.nombre,
-        secondary: `${product.codigoBarras} · Stock ${product.stock}`,
-        icon: 'bi-box-seam',
-      })));
+    this.service.products().subscribe({
+      next: (products) => {
+        this.products.set(products);
+        this.productOptions.set(products.map((product) => ({
+          id: product.id,
+          label: product.nombre,
+          secondary: `${product.codigoBarras} · Stock ${product.stock}`,
+          icon: 'bi-box-seam',
+        })));
+      },
+      error: () => this.error.set('No se pudieron cargar los productos para el abastecimiento.'),
     });
-    this.service.providers().subscribe((page) => {
-      this.providers.set(page.content);
-      this.providerOptions.set(page.content.map((provider) => ({
-        id: provider.id,
-        label: provider.nombre,
-        secondary: provider.email,
-        icon: 'bi-truck',
-      })));
+    this.service.providers().subscribe({
+      next: (page) => {
+        this.providers.set(page.content);
+        this.providerOptions.set(page.content.map((provider) => ({
+          id: provider.id,
+          label: provider.nombre,
+          secondary: provider.email,
+          icon: 'bi-truck',
+        })));
+      },
+      error: () => this.error.set('No se pudieron cargar los proveedores para el abastecimiento.'),
     });
   }
 
